@@ -31,7 +31,7 @@
                                            placeholder="Nombre de usuario"
                                            value="{{ old('username') }}"
                                            required>
-                                    <label for="username">Nombre de Usuario</label>
+                                    <label for="username">Usuario</label>
                                 </div>
                                 @error('username')
                                     <div class="invalid-feedback">
