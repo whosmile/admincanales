@@ -26,8 +26,11 @@
         <nav id="sidebar">
             <!-- User Info -->
             <div class="user-info d-flex align-items-center">
-                <img src="{{ asset('assets/images/default-icon.jpg') }}" alt="User Avatar">
-                <div>
+                <img src="{{ Auth::user()->avatar ? asset('storage/' . Auth::user()->avatar) : asset('assets/images/default-icon.jpg') }}" 
+                     alt="User Avatar" 
+                     class="rounded-circle"
+                     style="width: 40px; height: 40px; object-fit: cover;">
+                <div class="ms-2">
                     <div class="fw-bold">{{ Auth::user()->name }}</div>
                     <small>{{ Auth::user()->email }}</small>
                 </div>

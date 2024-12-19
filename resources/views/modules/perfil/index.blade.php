@@ -5,13 +5,6 @@
     <div class="row justify-content-center">
         <div class="col-lg-8">
             <!-- Mensajes de éxito o error -->
-            @if(session('success'))
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    {{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            @endif
-
             @if($errors->any())
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                     <ul class="mb-0">
@@ -30,9 +23,21 @@
                         <div class="col-md-3 text-center mb-4">
                             <div class="avatar-container">
                                 <div class="avatar-wrapper mb-3">
-                                    <img src="{{ Auth::user()->avatar ? Storage::url(Auth::user()->avatar) : asset('images/default-avatar.png') }}" 
+                                    @php
+                                        $avatarUrl = Auth::user()->avatar ? asset('storage/' . Auth::user()->avatar) : asset('images/default-avatar.png');
+                                    @endphp
+                                    <img src="{{ $avatarUrl }}" 
                                          class="rounded-circle avatar-img" 
-                                         alt="Avatar de {{ Auth::user()->name }}">
+                                         alt="Avatar de {{ Auth::user()->name }}"
+                                         style="width: 150px; height: 150px; object-fit: cover;">
+                                    <!-- Debug info -->
+                                    @if(Auth::user()->avatar)
+                                    <div class="d-none">
+                                        <p>Avatar path: {{ Auth::user()->avatar }}</p>
+                                        <p>Full URL: {{ $avatarUrl }}</p>
+                                        <p>File exists: {{ Storage::disk('public')->exists(Auth::user()->avatar) ? 'Yes' : 'No' }}</p>
+                                    </div>
+                                    @endif
                                     <div class="avatar-overlay">
                                         <label for="avatar" class="avatar-edit-btn">
                                             <i class="fas fa-camera"></i>
@@ -62,7 +67,7 @@
 
                         <!-- Formulario de edición -->
                         <div class="col-md-9">
-                            <form action="{{ route('perfil.update') }}" method="POST" enctype="multipart/form-data">
+                            <form action="{{ route('perfil.update') }}" method="POST" enctype="multipart/form-data" id="profileForm">
                                 @csrf
                                 @method('PUT')
                                 
@@ -288,71 +293,95 @@
 document.addEventListener('DOMContentLoaded', function() {
     const avatarInput = document.getElementById('avatar');
     const avatarImg = document.querySelector('.avatar-img');
-    const previewContainer = document.createElement('div');
-    previewContainer.className = 'preview-container';
-    document.body.appendChild(previewContainer);
+    const sidebarAvatar = document.querySelector('#sidebar .user-info img');
+    const form = document.getElementById('profileForm');
 
-    // Manejar la subida de avatar
+    // Mostrar mensaje de éxito si existe
+    @if(session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: '¡Éxito!',
+            text: "{{ session('success') }}",
+            timer: 3000,
+            showConfirmButton: false,
+            position: 'top-end',
+            toast: true
+        });
+    @endif
+
+    // Función para actualizar las imágenes
+    function updateImages(url) {
+        avatarImg.src = url;
+        if (sidebarAvatar) {
+            sidebarAvatar.src = url;
+        }
+    }
+
+    // Función para mostrar mensajes
+    function showMessage(type, message) {
+        Swal.fire({
+            icon: type,
+            title: type === 'success' ? '¡Éxito!' : 'Error',
+            text: message,
+            timer: type === 'success' ? 3000 : null,
+            showConfirmButton: type !== 'success',
+            position: 'top-end',
+            toast: true
+        });
+    }
+
+    // Preview de imagen
     avatarInput.addEventListener('change', function(e) {
         if (this.files && this.files[0]) {
             const reader = new FileReader();
-            
             reader.onload = function(e) {
-                avatarImg.src = e.target.result;
-                
-                // Mostrar preview
-                previewContainer.innerHTML = `
-                    <div class="preview-content">
-                        <img src="${e.target.result}" class="preview-image">
-                        <div class="mt-3 text-center">
-                            <button class="btn btn-primary me-2" onclick="document.querySelector('.preview-container').style.display='none'">
-                                Aceptar
-                            </button>
-                            <button class="btn btn-secondary" onclick="resetAvatar()">
-                                Cancelar
-                            </button>
-                        </div>
-                    </div>
-                `;
-                previewContainer.style.display = 'flex';
+                updateImages(e.target.result);
             }
-            
             reader.readAsDataURL(this.files[0]);
         }
     });
 
-    // Función para resetear el avatar
-    window.resetAvatar = function() {
-        avatarInput.value = '';
-        avatarImg.src = originalAvatarSrc;
-        previewContainer.style.display = 'none';
-    }
+    // Manejar el envío del formulario
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        
+        // Mostrar indicador de carga
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalBtnText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Guardando...';
+        submitBtn.disabled = true;
 
-    // Guardar la URL original del avatar
-    const originalAvatarSrc = avatarImg.src;
-
-    // Cerrar preview al hacer clic fuera
-    previewContainer.addEventListener('click', function(e) {
-        if (e.target === this) {
-            this.style.display = 'none';
-        }
-    });
-
-    // Toggle de visibilidad de contraseña
-    document.querySelectorAll('.toggle-password').forEach(button => {
-        button.addEventListener('click', function() {
-            const input = this.previousElementSibling;
-            const icon = this.querySelector('i');
-
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            } else {
-                input.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
+        fetch(this.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
             }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Actualizar las imágenes si hay una nueva URL de avatar
+                if (data.avatar_url) {
+                    updateImages(data.avatar_url);
+                }
+                
+                // Mostrar mensaje de éxito
+                showMessage('success', data.message);
+            } else {
+                throw new Error(data.message || 'Error al actualizar el perfil');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showMessage('error', error.message || 'Error al actualizar el perfil');
+        })
+        .finally(() => {
+            // Restaurar el botón
+            submitBtn.innerHTML = originalBtnText;
+            submitBtn.disabled = false;
         });
     });
 });
