@@ -137,21 +137,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Llenar tabla con datos
                     data.data.forEach(servicio => {
                         console.log('Processing service:', servicio);
+                        console.log('Service type:', servicio.tipo_servicio, servicio.TIPO_SERVICIO, servicio.tipo);
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                            <td>${servicio.nombre}</td>
-                            <td>${servicio.tipo}</td>
+                            <td>${servicio.nombre || 'N/A'}</td>
+                            <td>${servicio.tipo || servicio.TIPO_SERVICIO || 'N/A'}</td>
+                            <td>${servicio.estatus ? '<span class="badge bg-success">Activo</span>' : '<span class="badge bg-danger">Inactivo</span>'}</td>
+                            <td>${servicio.limite_minimo || 'N/A'}</td>
+                            <td>${servicio.limite_maximo || 'N/A'}</td>
+                            <td>${servicio.maxima_afiliacion || 'N/A'}</td>
                             <td>
-                                <span class="badge ${servicio.estatus === 'Activo' ? 'bg-success' : 'bg-danger'}">
-                                    ${servicio.estatus}
-                                </span>
-                            </td>
-                            <td>${servicio.limite_minimo}</td>
-                            <td>${servicio.limite_maximo}</td>
-                            <td>${servicio.maxima_afiliacion}</td>
-                            <td>
-                                <a href="/servicios/editar/${servicio.id}" class="btn btn-sm btn-primary" title="Editar servicio">
-                                    <i class="fas fa-edit"></i>
+                                <a href="/servicios/${servicio.id}/edit" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-edit"></i> Editar
                                 </a>
                             </td>
                         `;

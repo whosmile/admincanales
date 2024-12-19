@@ -48,7 +48,17 @@ class ServiciosController extends Controller
     public function edit($id)
     {
         $servicio = DB::table('servicios')
-            ->where('id', $id)
+            ->join('tipos_servicios', 'servicios.tipo_servicio_id', '=', 'tipos_servicios.id')
+            ->where('servicios.id', $id)
+            ->select(
+                'servicios.id',
+                'servicios.nombre',
+                'tipos_servicios.codigo as tipo_servicio',
+                'servicios.activo as estatus',
+                'servicios.limite_minimo',
+                'servicios.limite_maximo',
+                'servicios.maxima_afiliacion'
+            )
             ->first();
 
         if (!$servicio) {
@@ -67,25 +77,40 @@ class ServiciosController extends Controller
             'estatus' => 'required|boolean',
             'limite_minimo' => 'required|numeric|min:0',
             'limite_maximo' => 'required|numeric|gt:limite_minimo',
-            'maxima_afiliacion' => 'required|integer|min:1',
-            'multiplo' => 'required|numeric|min:0.01'
+            'maxima_afiliacion' => 'required|integer|min:1'
         ]);
 
-        DB::table('servicios')
-            ->where('id', $id)
-            ->update([
-                'nombre' => $request->nombre,
-                'tipo_servicio' => $request->tipo_servicio,
-                'estatus' => $request->estatus,
-                'limite_minimo' => $request->limite_minimo,
-                'limite_maximo' => $request->limite_maximo,
-                'maxima_afiliacion' => $request->maxima_afiliacion,
-                'multiplo' => $request->multiplo,
-                'fecha_modificacion' => now()
-            ]);
+        try {
+            // Get the tipo_servicio_id from tipos_servicios table
+            $tipo_servicio_id = DB::table('tipos_servicios')
+                ->where('codigo', $request->tipo_servicio)
+                ->value('id');
 
-        return redirect()->route('servicios.index')
-            ->with('success', 'Servicio actualizado exitosamente');
+            if (!$tipo_servicio_id) {
+                return redirect()->back()
+                    ->with('error', 'Tipo de servicio no válido')
+                    ->withInput();
+            }
+
+            DB::table('servicios')
+                ->where('id', $id)
+                ->update([
+                    'nombre' => $request->nombre,
+                    'tipo_servicio_id' => $tipo_servicio_id,
+                    'activo' => $request->estatus,
+                    'limite_minimo' => $request->limite_minimo,
+                    'limite_maximo' => $request->limite_maximo,
+                    'maxima_afiliacion' => $request->maxima_afiliacion
+                ]);
+
+            return redirect()->route('servicios.index')
+                ->with('success', '¡El servicio ha sido actualizado exitosamente!');
+
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Error al actualizar el servicio: ' . $e->getMessage())
+                ->withInput();
+        }
     }
 
     public function data(Request $request)
