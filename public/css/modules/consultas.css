@@ -1,0 +1,429 @@
+/* Estilos generales del módulo de consultas */
+.consultas-container {
+    padding: 1rem;
+}
+
+.consultas-header {
+    margin-bottom: 1.5rem;
+}
+
+.consultas-title {
+    color: var(--bs-gray-800);
+    font-weight: 600;
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+/* Estilos para los filtros */
+.filtros-card {
+    background-color: var(--bs-white);
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    margin-bottom: 2rem;
+}
+
+[data-bs-theme="dark"] .filtros-card,
+[data-bs-theme="dark"] .resultados-card,
+[data-bs-theme="dark"] .card {
+    background-color: var(--bs-gray-900);
+    border: 1px solid var(--bs-gray-800);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.filtros-body {
+    padding: 1.25rem;
+}
+
+/* Estilos para los labels de filtros */
+.consultas-container .form-label,
+.filtros-card .form-label {
+    color: var(--bs-gray-700);
+    font-weight: 500;
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+/* Dark mode overrides */
+html[data-bs-theme="dark"] .consultas-container .form-label,
+html[data-bs-theme="dark"] .filtros-card .form-label,
+html[data-bs-theme="dark"] .consultas-container label {
+    color: var(--bs-gray-200) !important;
+}
+
+html[data-bs-theme="dark"] .consultas-container .input-group-text {
+    background-color: var(--bs-gray-800) !important;
+    border-color: var(--bs-gray-700) !important;
+    color: var(--bs-gray-300) !important;
+}
+
+html[data-bs-theme="dark"] .consultas-container .input-group-text i {
+    color: var(--bs-gray-400) !important;
+}
+
+html[data-bs-theme="dark"] .consultas-container .form-control {
+    background-color: var(--bs-gray-800) !important;
+    border-color: var(--bs-gray-700) !important;
+    color: var(--bs-gray-200) !important;
+}
+
+html[data-bs-theme="dark"] .consultas-container .form-control:focus {
+    background-color: var(--bs-gray-800) !important;
+    border-color: var(--bs-orange-500) !important;
+    color: var(--bs-gray-200) !important;
+    box-shadow: 0 0 0 0.2rem rgba(255, 123, 0, 0.2) !important;
+}
+
+html[data-bs-theme="dark"] .consultas-container .form-control::placeholder {
+    color: var(--bs-gray-500) !important;
+}
+
+/* Asegurar que los labels sean visibles en modo oscuro */
+html[data-bs-theme="dark"] .consultas-container .filtros-card label,
+html[data-bs-theme="dark"] .consultas-container .form-label {
+    color: #ffffff !important;
+    opacity: 0.9 !important;
+}
+
+.form-control,
+.form-select {
+    border: 1px solid var(--bs-gray-200);
+    border-radius: 0.375rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    height: 2.5rem;
+    transition: all 0.2s ease-in-out;
+    background-color: var(--bs-white);
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--bs-orange-300);
+    box-shadow: 0 0 0 0.2rem rgba(255, 123, 0, 0.1);
+}
+
+.form-control::placeholder {
+    color: var(--bs-gray-500);
+    font-size: 0.813rem;
+}
+
+.input-group .form-select {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: none;
+    min-width: 70px;
+    background-color: var(--bs-gray-50);
+    font-weight: 500;
+    color: var(--bs-gray-700);
+}
+
+.input-group .form-select:focus {
+    border-right: none;
+    box-shadow: -0.2rem 0 0.2rem rgba(255, 123, 0, 0.1);
+}
+
+.input-group .form-control {
+    border-left: none;
+    border-radius: 0;
+    padding-left: 0.5rem;
+}
+
+.input-group .form-control:focus {
+    border-left: none;
+    box-shadow: 0.2rem 0 0.2rem rgba(255, 123, 0, 0.1);
+}
+
+.input-group .btn {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+/* Botones de acción */
+.btn-consultas {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: 0.375rem;
+    height: 2.5rem;
+    display: inline-flex;
+    align-items: center;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-consultas i {
+    margin-right: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.btn-consultas.btn-primary {
+    background-color: var(--bs-orange-500);
+    border-color: var(--bs-orange-500);
+}
+
+.btn-consultas.btn-primary:hover {
+    background-color: var(--bs-orange-600);
+    border-color: var(--bs-orange-600);
+}
+
+.btn-consultas.btn-secondary {
+    background-color: var(--bs-gray-100);
+    border-color: var(--bs-gray-200);
+    color: var(--bs-gray-700);
+}
+
+.btn-consultas.btn-secondary:hover {
+    background-color: var(--bs-gray-200);
+    border-color: var(--bs-gray-300);
+}
+
+/* Tabla de resultados */
+.resultados-card {
+    background-color: var(--bs-white);
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    margin-top: 0.5rem;
+}
+
+.resultados-card .card-body {
+    padding: 1.5rem;
+}
+
+.resultados-card .info-group {
+    margin-bottom: 1.25rem;
+}
+
+.resultados-card .info-label {
+    font-size: 0.875rem;
+    color: var(--bs-gray-600);
+    margin-bottom: 0.25rem;
+    font-weight: 500;
+}
+
+.resultados-card p {
+    font-size: 1rem;
+    color: var(--bs-gray-900);
+    margin-bottom: 0;
+}
+
+.badge-estado.badge-activo {
+    background-color: var(--bs-green-100);
+    color: var(--bs-green-700);
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-weight: 500;
+    font-size: 0.813rem;
+}
+
+/* Dark mode styles */
+html[data-bs-theme="dark"] .resultados-card .info-label {
+    color: var(--bs-gray-400);
+}
+
+html[data-bs-theme="dark"] .resultados-card p,
+html[data-bs-theme="dark"] .card-title,
+html[data-bs-theme="dark"] .resultados-card .card-title {
+    color: var(--bs-gray-200);
+}
+
+.resultados-card .card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--bs-gray-900);
+    margin-bottom: 1.5rem;
+}
+
+html[data-bs-theme="dark"] .resultados-card .card-title,
+html[data-bs-theme="dark"] .card-title {
+    color: var(--bs-white) !important;
+}
+
+.badge-estado {
+    padding: 0.25rem 0.625rem;
+    font-weight: 500;
+    font-size: 0.75rem;
+    border-radius: 1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 5rem;
+}
+
+.badge-completada {
+    background-color: var(--bs-green-100);
+    color: var(--bs-green-700);
+}
+
+.badge-fallida {
+    background-color: var(--bs-red-100);
+    color: var(--bs-red-700);
+}
+
+.badge-pendiente {
+    background-color: var(--bs-yellow-100);
+    color: var(--bs-yellow-700);
+}
+
+/* Paginación */
+.pagination-container {
+    padding: 0.75rem 1rem;
+    border-top: 1px solid var(--bs-gray-200);
+}
+
+.pagination {
+    margin: 0;
+    gap: 0.25rem;
+}
+
+.pagination-sm .page-link {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    min-width: 1.5rem;
+    height: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.pagination-sm .page-item:first-child .page-link {
+    border-top-left-radius: 0.25rem;
+    border-bottom-left-radius: 0.25rem;
+}
+
+.pagination-sm .page-item:last-child .page-link {
+    border-top-right-radius: 0.25rem;
+    border-bottom-right-radius: 0.25rem;
+}
+
+.page-link {
+    border: 1px solid var(--bs-gray-200);
+    color: var(--bs-orange-600);
+    background-color: var(--bs-white);
+    margin: 0;
+    position: relative;
+    text-align: center;
+}
+
+.page-link:hover {
+    background-color: var(--bs-orange-50);
+    border-color: var(--bs-orange-200);
+    color: var(--bs-orange-700);
+    z-index: 2;
+}
+
+.page-item.active .page-link {
+    background-color: var(--bs-orange-500);
+    border-color: var(--bs-orange-500);
+    color: var(--bs-white);
+    z-index: 3;
+}
+
+.page-item.disabled .page-link {
+    background-color: var(--bs-gray-50);
+    border-color: var(--bs-gray-100);
+    color: var(--bs-gray-400);
+    pointer-events: none;
+}
+
+/* Mensaje sin resultados */
+.no-resultados {
+    padding: 2rem 1rem;
+    text-align: center;
+    color: var(--bs-gray-600);
+}
+
+.no-resultados i {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+    color: var(--bs-gray-400);
+}
+
+.no-resultados p {
+    font-size: 0.875rem;
+}
+
+/* Espaciado entre campos de búsqueda */
+.row.g-3 {
+    --bs-gutter-y: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.row.g-3 > [class*="col-"] {
+    margin-bottom: 0.5rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .consultas-container {
+        padding: 0.75rem;
+    }
+
+    .filtros-body {
+        padding: 1rem;
+    }
+
+    .table-consultas {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .btn-consultas {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+
+    .row.g-3 {
+        --bs-gutter-y: 0.75rem;
+    }
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.filtros-card,
+.resultados-card {
+    animation: fadeIn 0.3s ease-out;
+}
+
+.table-consultas {
+    margin-bottom: 0;
+    font-size: 0.875rem;
+}
+
+.table-consultas thead th {
+    background-color: var(--bs-gray-50);
+    border-bottom: 2px solid var(--bs-gray-200);
+    color: var(--bs-gray-700);
+    font-weight: 600;
+    font-size: 0.813rem;
+    padding: 0.75rem 1rem;
+    white-space: nowrap;
+}
+
+.table-consultas tbody td {
+    color: var(--bs-gray-800);
+    font-size: 0.875rem;
+    padding: 0.75rem 1rem;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--bs-gray-100);
+}
+
+.table-consultas tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.table-consultas tbody tr:hover {
+    background-color: var(--bs-gray-50);
+}

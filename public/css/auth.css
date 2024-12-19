@@ -1,0 +1,372 @@
+:root {
+    --bs-orange: #FF9800;
+    --bs-orange-rgb: 255, 152, 0;
+    --bs-orange-600: #F57C00;
+    --bs-danger: #F44336;
+    --bs-orange-50: #fff3e6;
+}
+
+body {
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+    background: #F2F2F2;
+    position: relative;
+    overflow-x: hidden;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: -100%;
+    left: -100%;
+    right: -100%;
+    bottom: -100%;
+    background: repeating-linear-gradient(
+        -45deg,
+        rgba(242, 34, 72, 0.015) 0px,
+        rgba(242, 34, 72, 0.015) 50px,
+        rgba(242, 171, 39, 0.015) 50px,
+        rgba(242, 171, 39, 0.015) 100px,
+        rgba(242, 154, 46, 0.015) 100px,
+        rgba(242, 154, 46, 0.015) 150px,
+        rgba(38, 34, 35, 0.015) 150px,
+        rgba(38, 34, 35, 0.015) 200px
+    );
+    z-index: 0;
+    animation: moveBackgroundSlow 120s linear infinite;
+}
+
+@keyframes moveBackgroundSlow {
+    0% {
+        transform: translate(0, 0);
+    }
+    100% {
+        transform: translate(-200px, 200px);
+    }
+}
+
+body.fade-in {
+    opacity: 1;
+}
+
+body.transitioning {
+    overflow: hidden;
+}
+
+.auth-container {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    z-index: 1;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e4e7eb 100%);
+}
+
+.auth-card {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+    background: white;
+    border-radius: 1.5rem;
+    width: 100%;
+    max-width: 900px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    padding: 0;
+    z-index: 2;
+    background: #ffffff;
+    transition: transform 0.3s ease;
+}
+
+.mosaic-background {
+    width: 45%;
+    background: #262223;
+    position: relative;
+    overflow: hidden;
+}
+
+.mosaic-background::before {
+    content: '';
+    position: absolute;
+    top: -100%;
+    left: -100%;
+    right: -100%;
+    bottom: -100%;
+    background: repeating-linear-gradient(
+        -45deg,
+        #F22248 0px,
+        #F22248 50px,
+        #F2AB27 50px,
+        #F2AB27 100px,
+        #F29A2E 100px,
+        #F29A2E 150px,
+        #262223 150px,
+        #262223 200px
+    );
+}
+
+.mosaic-background::after {
+    content: '';
+    position: absolute;
+    height: 150%;
+    width: 100%;
+    top: 50%;
+    right: -50%;
+    background: white;
+    border-radius: 50%;
+    transform: translate(0, -50%);
+}
+
+.login-content {
+    flex: 1;
+    padding: 2.5rem 3rem 2.5rem 0;
+    margin-left: -2rem;
+    background: white;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.auth-form {
+    max-width: 400px;
+    margin-left: 3rem;
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    margin-left: 3rem;
+    padding-right: 3rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.auth-logo {
+    max-width: 200px;
+    height: auto;
+}
+
+.auth-form .form-floating {
+    position: relative;
+}
+
+.auth-form .form-control {
+    height: 60px;
+    border-radius: 0.75rem;
+    border: 1.5px solid #e0e0e0;
+    padding: 1.5rem 1rem 0.5rem;
+    background-color: white;
+    font-size: 1rem;
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.auth-form .form-floating label {
+    padding: 1rem;
+    height: auto;
+    font-size: 1rem;
+    color: #666;
+    pointer-events: none;
+    transform-origin: 0 0;
+    transition: transform 0.2s ease-in-out, 
+                opacity 0.2s ease-in-out, 
+                color 0.2s ease-in-out;
+}
+
+.auth-form .form-floating > .form-control:focus ~ label,
+.auth-form .form-floating > .form-control:not(:placeholder-shown) ~ label {
+    transform: scale(0.85) translateY(-1rem);
+    opacity: 1;
+    color: #F29A2E;
+}
+
+.auth-form .form-control:focus {
+    border-color: #F29A2E;
+    box-shadow: 0 0 0 0.25rem rgba(242, 154, 46, 0.25);
+}
+
+.auth-form .form-floating > .form-control::placeholder {
+    color: transparent;
+}
+
+.auth-form .form-floating > .form-control:not(:placeholder-shown) {
+    background-color: white;
+}
+
+.auth-form .btn-primary {
+    background: linear-gradient(45deg, #F29A2E, #F2AB27);
+    border: none;
+    border-radius: 0.75rem;
+    padding: 0.875rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.auth-form .btn-primary:hover {
+    background: linear-gradient(45deg, #e08a1e, #d99922);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.25);
+}
+
+.auth-form .btn-primary:active {
+    transform: translateY(0);
+}
+
+.auth-form .invalid-feedback {
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    color: #F22248;
+}
+
+.auth-form .btn-outline-secondary {
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    color: #666;
+    border-color: #ddd;
+}
+
+.auth-form .btn-outline-secondary:hover {
+    background-color: #f5f5f5;
+    border-color: #ccc;
+    color: #333;
+}
+
+.auth-form .spinner-border {
+    width: 1.2rem;
+    height: 1.2rem;
+    border-width: 0.15em;
+}
+
+.opacity-50 {
+    opacity: 0.5;
+}
+
+.page-content {
+    position: relative;
+    min-height: 100vh;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.page-content.fade-out {
+    opacity: 0;
+}
+
+.page-transition {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #FF9800 0%, #F44336 100%);
+    transform: translateX(100%);
+    z-index: 9999;
+    transition: transform 0.5s ease-in-out;
+    pointer-events: none;
+}
+
+.page-transition.active {
+    transform: translateX(0);
+}
+
+.alert {
+    border-radius: 0.5rem;
+    border: none;
+    margin-bottom: 1.5rem;
+}
+
+.form-text {
+    font-size: 0.875rem;
+    color: #666666;
+}
+
+[data-bs-theme="dark"] .form-text,
+[data-bs-theme="dark"] .cedula-help-text {
+    color: #ffffff !important;
+    opacity: 0.8;
+}
+
+/* Asegurar que el texto de ayuda de la cédula sea visible en modo oscuro */
+[data-bs-theme="dark"] .auth-form .form-text {
+    color: #ffffff !important;
+    opacity: 0.8;
+}
+
+.auth-form .btn-orange {
+    background: linear-gradient(45deg, #F29A2E, #F2AB27) !important;
+    border: none !important;
+    color: white !important;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.auth-form .btn-orange:hover {
+    background: linear-gradient(45deg, #e08a1e, #d99922) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(242, 154, 46, 0.25);
+}
+
+.auth-form .btn-orange:active {
+    transform: translateY(0);
+}
+
+.bg-orange {
+    background: #F29A2E !important;
+}
+
+.hover-lift {
+    transition: transform 0.2s ease;
+}
+
+.hover-lift:hover {
+    transform: translateY(-2px);
+}
+
+.btn-orange {
+    background: linear-gradient(45deg, #F29A2E, #F2AB27) !important;
+    border: none !important;
+    color: white !important;
+}
+
+.btn-orange:hover {
+    background: linear-gradient(45deg, #e08a1e, #d99922) !important;
+    color: white !important;
+    transform: translateY(-2px);
+}
+
+.btn-orange:active {
+    transform: translateY(0);
+}
+
+.text-orange {
+    color: #F29A2E !important;
+}
+
+@media (max-width: 768px) {
+    .mosaic-background,
+    .mosaic-background::after {
+        display: none;
+    }
+    
+    .login-content {
+        width: 100%;
+        padding: 2rem;
+        margin-left: 0;
+    }
+    
+    .auth-card {
+        max-width: 450px;
+        margin: 1rem;
+    }
+    
+    .auth-header,
+    .auth-form {
+        margin-left: 0;
+    }
+}
