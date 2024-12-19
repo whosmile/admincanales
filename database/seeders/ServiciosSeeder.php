@@ -7,121 +7,170 @@ use Illuminate\Support\Facades\DB;
 
 class ServiciosSeeder extends Seeder
 {
-    public function run()
+    public function run(): void
     {
         $servicios = [
-            // Telefonía Fija
+            // Telefonía
             [
-                'NOMBRE' => 'CANTV',
-                'TIPO_SERVICIO' => 'TELEFONIA',
-                'ESTATUS' => true,
-                'LIMITE_MINIMO' => 50.00,
-                'LIMITE_MAXIMO' => 1000.00,
-                'MAXIMA_AFILIACION' => 3,
-                'MULTIPLO' => 5.00,
-                'FECHA_CREACION' => now(),
-            ],
-
-            // Telefonía Móvil
-            [
-                'NOMBRE' => 'Movistar',
-                'TIPO_SERVICIO' => 'TELEFONIA_MOVIL',
-                'ESTATUS' => true,
-                'LIMITE_MINIMO' => 20.00,
-                'LIMITE_MAXIMO' => 500.00,
-                'MAXIMA_AFILIACION' => 5,
-                'MULTIPLO' => 2.00,
-                'FECHA_CREACION' => now(),
+                'tipo_servicio_id' => DB::table('tipos_servicios')->where('codigo', 'TELEFONIA')->value('id'),
+                'nombre' => 'Movistar Venezuela',
+                'empresa' => 'Telefónica Venezuela',
+                'codigo_servicio' => 'MOVISTAR_VE',
+                'limite_minimo' => 1.00,
+                'limite_maximo' => 1000000.00,
+                'maxima_afiliacion' => 5,
+                'activo' => true,
+                'descripcion' => 'Servicios de telefonía móvil Movistar',
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
-                'NOMBRE' => 'Digitel',
-                'TIPO_SERVICIO' => 'TELEFONIA_MOVIL',
-                'ESTATUS' => true,
-                'LIMITE_MINIMO' => 25.00,
-                'LIMITE_MAXIMO' => 600.00,
-                'MAXIMA_AFILIACION' => 5,
-                'MULTIPLO' => 2.50,
-                'FECHA_CREACION' => now(),
-            ],
-
-            // Televisión
-            [
-                'NOMBRE' => 'SimpleTV',
-                'TIPO_SERVICIO' => 'TELEVISION',
-                'ESTATUS' => true,
-                'LIMITE_MINIMO' => 100.00,
-                'LIMITE_MAXIMO' => 2000.00,
-                'MAXIMA_AFILIACION' => 2,
-                'MULTIPLO' => 10.00,
-                'FECHA_CREACION' => now(),
-            ],
-            [
-                'NOMBRE' => 'Inter',
-                'TIPO_SERVICIO' => 'TELEVISION',
-                'ESTATUS' => true,
-                'LIMITE_MINIMO' => 120.00,
-                'LIMITE_MAXIMO' => 2500.00,
-                'MAXIMA_AFILIACION' => 2,
-                'MULTIPLO' => 10.00,
-                'FECHA_CREACION' => now(),
-            ],
-
-            // Agua
-            [
-                'NOMBRE' => 'Hidrocapital',
-                'TIPO_SERVICIO' => 'AGUA',
-                'ESTATUS' => true,
-                'LIMITE_MINIMO' => 30.00,
-                'LIMITE_MAXIMO' => 800.00,
-                'MAXIMA_AFILIACION' => 1,
-                'MULTIPLO' => 5.00,
-                'FECHA_CREACION' => now(),
-            ],
-
-            // Gas
-            [
-                'NOMBRE' => 'PDVSA Gas',
-                'TIPO_SERVICIO' => 'GAS',
-                'ESTATUS' => true,
-                'LIMITE_MINIMO' => 40.00,
-                'LIMITE_MAXIMO' => 600.00,
-                'MAXIMA_AFILIACION' => 1,
-                'MULTIPLO' => 5.00,
-                'FECHA_CREACION' => now(),
+                'tipo_servicio_id' => DB::table('tipos_servicios')->where('codigo', 'TELEFONIA')->value('id'),
+                'nombre' => 'Digitel',
+                'empresa' => 'Corporación Digitel C.A.',
+                'codigo_servicio' => 'DIGITEL_VE',
+                'limite_minimo' => 1.00,
+                'limite_maximo' => 1000000.00,
+                'maxima_afiliacion' => 5,
+                'activo' => true,
+                'descripcion' => 'Servicios de telefonía móvil Digitel',
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
 
             // Electricidad
             [
-                'NOMBRE' => 'Corpoelec',
-                'TIPO_SERVICIO' => 'ELECTRICIDAD',
-                'ESTATUS' => true,
-                'LIMITE_MINIMO' => 80.00,
-                'LIMITE_MAXIMO' => 3000.00,
-                'MAXIMA_AFILIACION' => 1,
-                'MULTIPLO' => 10.00,
-                'FECHA_CREACION' => now(),
+                'tipo_servicio_id' => DB::table('tipos_servicios')->where('codigo', 'ELECTRICIDAD')->value('id'),
+                'nombre' => 'CORPOELEC',
+                'empresa' => 'Corporación Eléctrica Nacional',
+                'codigo_servicio' => 'CORPOELEC_VE',
+                'limite_minimo' => 1.00,
+                'limite_maximo' => 5000000.00,
+                'maxima_afiliacion' => 3,
+                'activo' => true,
+                'descripcion' => 'Servicio eléctrico nacional',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+
+            // Agua
+            [
+                'tipo_servicio_id' => DB::table('tipos_servicios')->where('codigo', 'AGUA')->value('id'),
+                'nombre' => 'Hidrocapital',
+                'empresa' => 'Hidrológica de la Región Capital',
+                'codigo_servicio' => 'HIDROCAPITAL_VE',
+                'limite_minimo' => 1.00,
+                'limite_maximo' => 1000000.00,
+                'maxima_afiliacion' => 3,
+                'activo' => true,
+                'descripcion' => 'Servicio de agua potable región capital',
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
 
             // Internet
             [
-                'NOMBRE' => 'CANTV ABA',
-                'TIPO_SERVICIO' => 'INTERNET',
-                'ESTATUS' => true,
-                'LIMITE_MINIMO' => 150.00,
-                'LIMITE_MAXIMO' => 2000.00,
-                'MAXIMA_AFILIACION' => 2,
-                'MULTIPLO' => 10.00,
-                'FECHA_CREACION' => now(),
+                'tipo_servicio_id' => DB::table('tipos_servicios')->where('codigo', 'INTERNET')->value('id'),
+                'nombre' => 'CANTV',
+                'empresa' => 'Compañía Anónima Nacional Teléfonos de Venezuela',
+                'codigo_servicio' => 'CANTV_INTERNET_VE',
+                'limite_minimo' => 1.00,
+                'limite_maximo' => 2000000.00,
+                'maxima_afiliacion' => 3,
+                'activo' => true,
+                'descripcion' => 'Servicio de internet ABA',
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
+
+            // Televisión
             [
-                'NOMBRE' => 'NetUno',
-                'TIPO_SERVICIO' => 'INTERNET',
-                'ESTATUS' => true,
-                'LIMITE_MINIMO' => 180.00,
-                'LIMITE_MAXIMO' => 2500.00,
-                'MAXIMA_AFILIACION' => 2,
-                'MULTIPLO' => 10.00,
-                'FECHA_CREACION' => now(),
+                'tipo_servicio_id' => DB::table('tipos_servicios')->where('codigo', 'TELEVISION')->value('id'),
+                'nombre' => 'Inter',
+                'empresa' => 'Inter Venezuela',
+                'codigo_servicio' => 'INTER_VE',
+                'limite_minimo' => 1.00,
+                'limite_maximo' => 1500000.00,
+                'maxima_afiliacion' => 2,
+                'activo' => true,
+                'descripcion' => 'Servicio de televisión por cable',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+
+            // Gas
+            [
+                'tipo_servicio_id' => DB::table('tipos_servicios')->where('codigo', 'GAS')->value('id'),
+                'nombre' => 'Gas Comunal',
+                'empresa' => 'Gas Comunal S.A.',
+                'codigo_servicio' => 'GAS_COMUNAL_VE',
+                'limite_minimo' => 1.00,
+                'limite_maximo' => 500000.00,
+                'maxima_afiliacion' => 2,
+                'activo' => true,
+                'descripcion' => 'Servicio de gas doméstico',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+
+            // Seguros
+            [
+                'tipo_servicio_id' => DB::table('tipos_servicios')->where('codigo', 'SEGUROS')->value('id'),
+                'nombre' => 'Seguros La Previsora',
+                'empresa' => 'La Previsora Seguros C.A.',
+                'codigo_servicio' => 'PREVISORA_VE',
+                'limite_minimo' => 100.00,
+                'limite_maximo' => 10000000.00,
+                'maxima_afiliacion' => 5,
+                'activo' => true,
+                'descripcion' => 'Servicios de seguros varios',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+
+            // Impuestos
+            [
+                'tipo_servicio_id' => DB::table('tipos_servicios')->where('codigo', 'IMPUESTOS')->value('id'),
+                'nombre' => 'SENIAT',
+                'empresa' => 'Servicio Nacional Integrado de Administración Aduanera y Tributaria',
+                'codigo_servicio' => 'SENIAT_VE',
+                'limite_minimo' => 1.00,
+                'limite_maximo' => 50000000.00,
+                'maxima_afiliacion' => 1,
+                'activo' => true,
+                'descripcion' => 'Pago de impuestos nacionales',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+
+            // Educación
+            [
+                'tipo_servicio_id' => DB::table('tipos_servicios')->where('codigo', 'EDUCACION')->value('id'),
+                'nombre' => 'Universidad Central de Venezuela',
+                'empresa' => 'Universidad Central de Venezuela',
+                'codigo_servicio' => 'UCV_VE',
+                'limite_minimo' => 1.00,
+                'limite_maximo' => 5000000.00,
+                'maxima_afiliacion' => 2,
+                'activo' => true,
+                'descripcion' => 'Pagos universitarios UCV',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+
+            // Tarjetas de Crédito
+            [
+                'tipo_servicio_id' => DB::table('tipos_servicios')->where('codigo', 'TARJETAS')->value('id'),
+                'nombre' => 'Banco de Venezuela',
+                'empresa' => 'Banco de Venezuela S.A.',
+                'codigo_servicio' => 'BDV_TC_VE',
+                'limite_minimo' => 1.00,
+                'limite_maximo' => 100000000.00,
+                'maxima_afiliacion' => 5,
+                'activo' => true,
+                'descripcion' => 'Pago de tarjetas de crédito Banco de Venezuela',
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
         ];
 

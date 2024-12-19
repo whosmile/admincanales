@@ -31,14 +31,14 @@ class ServiciosController extends Controller
         ]);
 
         DB::table('servicios')->insert([
-            'NOMBRE' => $request->nombre,
-            'TIPO_SERVICIO' => $request->tipo_servicio,
-            'ESTATUS' => $request->estatus,
-            'LIMITE_MINIMO' => $request->limite_minimo,
-            'LIMITE_MAXIMO' => $request->limite_maximo,
-            'MAXIMA_AFILIACION' => $request->maxima_afiliacion,
-            'MULTIPLO' => $request->multiplo,
-            'FECHA_CREACION' => now()
+            'nombre' => $request->nombre,
+            'tipo_servicio' => $request->tipo_servicio,
+            'estatus' => $request->estatus,
+            'limite_minimo' => $request->limite_minimo,
+            'limite_maximo' => $request->limite_maximo,
+            'maxima_afiliacion' => $request->maxima_afiliacion,
+            'multiplo' => $request->multiplo,
+            'fecha_creacion' => now()
         ]);
 
         return redirect()->route('servicios.index')
@@ -48,7 +48,7 @@ class ServiciosController extends Controller
     public function edit($id)
     {
         $servicio = DB::table('servicios')
-            ->where('ID_SERVICIO', $id)
+            ->where('id', $id)
             ->first();
 
         if (!$servicio) {
@@ -72,16 +72,16 @@ class ServiciosController extends Controller
         ]);
 
         DB::table('servicios')
-            ->where('ID_SERVICIO', $id)
+            ->where('id', $id)
             ->update([
-                'NOMBRE' => $request->nombre,
-                'TIPO_SERVICIO' => $request->tipo_servicio,
-                'ESTATUS' => $request->estatus,
-                'LIMITE_MINIMO' => $request->limite_minimo,
-                'LIMITE_MAXIMO' => $request->limite_maximo,
-                'MAXIMA_AFILIACION' => $request->maxima_afiliacion,
-                'MULTIPLO' => $request->multiplo,
-                'FECHA_MODIFICACION' => now()
+                'nombre' => $request->nombre,
+                'tipo_servicio' => $request->tipo_servicio,
+                'estatus' => $request->estatus,
+                'limite_minimo' => $request->limite_minimo,
+                'limite_maximo' => $request->limite_maximo,
+                'maxima_afiliacion' => $request->maxima_afiliacion,
+                'multiplo' => $request->multiplo,
+                'fecha_modificacion' => now()
             ]);
 
         return redirect()->route('servicios.index')
@@ -93,7 +93,7 @@ class ServiciosController extends Controller
         $query = DB::table('servicios');
 
         if ($request->filled('tipo_servicio')) {
-            $query->where('TIPO_SERVICIO', $request->tipo_servicio);
+            $query->where('tipo_servicio', $request->tipo_servicio);
         }
 
         $servicios = $query->get();
@@ -103,7 +103,61 @@ class ServiciosController extends Controller
 
     public function destroy($id)
     {
-        DB::table('servicios')->where('ID_SERVICIO', $id)->delete();
+        DB::table('servicios')->where('id', $id)->delete();
         return response()->json(['message' => 'Servicio eliminado exitosamente']);
+    }
+
+    public function setTipo(Request $request)
+    {
+        try {
+            $request->validate([
+                'tipo' => 'required|string'
+            ]);
+
+            session(['tipo_servicio' => $request->tipo]);
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al establecer el tipo de servicio: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function getData(Request $request)
+    {
+        try {
+            $tipo = $request->query('tipo');
+            if (!$tipo) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Tipo de servicio no especificado'
+                ], 400);
+            }
+
+            $servicios = DB::table('servicios')
+                ->join('tipos_servicios', 'servicios.tipo_servicio_id', '=', 'tipos_servicios.id')
+                ->where('tipos_servicios.codigo', $tipo)
+                ->select(
+                    'servicios.id',
+                    'servicios.nombre',
+                    'tipos_servicios.codigo as tipo',
+                    DB::raw('IF(servicios.activo = 1, "Activo", "Inactivo") as estatus'),
+                    'servicios.limite_minimo',
+                    'servicios.limite_maximo',
+                    'servicios.maxima_afiliacion'
+                )
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => $servicios
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al obtener los servicios: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

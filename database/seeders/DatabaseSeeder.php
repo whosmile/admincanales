@@ -18,9 +18,10 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             ParameterGroupSeeder::class,
             ParameterSeeder::class,
-            ServiceSeeder::class,
             TiposTransaccionSeeder::class,
             TransaccionesSeeder::class,
+            TiposServiciosSeeder::class,
+            ServiciosSeeder::class,
         ]);
     }
 }

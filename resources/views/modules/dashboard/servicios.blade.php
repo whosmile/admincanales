@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', function() {
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
         
-        const servicioSeleccionado = tipoServicio.value; // Removed uppercase conversion
+        const servicioSeleccionado = tipoServicio.value;
         
         if (!servicioSeleccionado) {
             alert('Por favor seleccione un tipo de servicio');
@@ -118,7 +118,7 @@ document.addEventListener('DOMContentLoaded', function() {
             errorMessage.style.display = 'none';
             
             try {
-                const response = await fetch(`/servicios/data?tipo=${servicioSeleccionado}`, {
+                const response = await fetch(`/servicios/data?tipo=${encodeURIComponent(servicioSeleccionado)}`, {
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest',
                         'Accept': 'application/json',
@@ -126,13 +126,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
                 
                 const data = await response.json();
+                console.log('Response data:', data);
                 
                 if (data.success) {
                     // Limpiar tabla
                     tablaServiciosBody.innerHTML = '';
                     
+                    console.log('Number of services:', data.data.length);
+                    
                     // Llenar tabla con datos
                     data.data.forEach(servicio => {
+                        console.log('Processing service:', servicio);
                         const row = document.createElement('tr');
                         row.innerHTML = `
                             <td>${servicio.nombre}</td>

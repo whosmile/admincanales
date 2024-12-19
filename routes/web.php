@@ -65,14 +65,17 @@ Route::middleware('auth')->group(function () {
     });
     
     // Servicios
-    Route::get('/servicios', [ServiciosController::class, 'index'])->name('servicios.index');
-    Route::get('/servicios/create', [ServiciosController::class, 'create'])->name('servicios.create');
-    Route::post('/servicios', [ServiciosController::class, 'store'])->name('servicios.store');
-    Route::get('/servicios/data', [ServiciosController::class, 'data'])->name('servicios.data');
-    Route::get('/servicios/{id}/edit', [ServiciosController::class, 'edit'])->name('servicios.edit');
-    Route::put('/servicios/{id}', [ServiciosController::class, 'update'])->name('servicios.update');
-    Route::get('/servicios/empresas/{tipo}', [ServiciosController::class, 'getEmpresas'])->name('servicios.empresas');
-    Route::delete('/servicios/{id}', [ServiciosController::class, 'destroy'])->name('servicios.destroy');
+    Route::prefix('servicios')->group(function () {
+        Route::get('/', [ServiciosController::class, 'index'])->name('servicios.index');
+        Route::post('/set-tipo', [ServiciosController::class, 'setTipo'])->name('servicios.setTipo');
+        Route::get('/data', [ServiciosController::class, 'getData'])->name('servicios.getData');
+        Route::get('/create', [ServiciosController::class, 'create'])->name('servicios.create');
+        Route::post('/servicios', [ServiciosController::class, 'store'])->name('servicios.store');
+        Route::get('/servicios/{id}/edit', [ServiciosController::class, 'edit'])->name('servicios.edit');
+        Route::put('/servicios/{id}', [ServiciosController::class, 'update'])->name('servicios.update');
+        Route::get('/servicios/empresas/{tipo}', [ServiciosController::class, 'getEmpresas'])->name('servicios.empresas');
+        Route::delete('/servicios/{id}', [ServiciosController::class, 'destroy'])->name('servicios.destroy');
+    });
     
     // Perfil
     Route::prefix('perfil')->group(function () {

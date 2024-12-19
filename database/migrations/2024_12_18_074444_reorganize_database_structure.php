@@ -189,8 +189,8 @@ return new class extends Migration
                 $table->string('nombre');
                 $table->enum('tipo_servicio', ['telefonia', 'electricidad', 'agua', 'tv']);
                 $table->enum('estatus', ['Activo', 'Inactivo'])->default('Activo');
-                $table->decimal('limite_minimo', 10, 2);
-                $table->decimal('limite_maximo', 10, 2);
+                $table->decimal('limite_minimo', 20, 2);
+                $table->decimal('limite_maximo', 20, 2);
                 $table->integer('maxima_afiliacion');
                 $table->timestamps();
             });
