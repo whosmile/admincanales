@@ -12,15 +12,15 @@ class RoleSeeder extends Seeder
         $roles = [
             [
                 'nombre' => 'Administrador',
-                'descripcion' => 'Rol con acceso completo al sistema',
+                'descripcion' => 'Rol con acceso total y privilegios completos. Gestiona usuarios, base de datos y tiene visibilidad total del sistema.',
             ],
             [
-                'nombre' => 'Usuario',
-                'descripcion' => 'Usuario regular del sistema',
+                'nombre' => 'Usuario Máster',
+                'descripcion' => 'Rol con alto nivel de control. Acceso a consultas de clientes, bitácoras de administradores y logs transaccionales.',
             ],
             [
                 'nombre' => 'Operador',
-                'descripcion' => 'Operador con acceso a funciones específicas',
+                'descripcion' => 'Rol para tareas operativas básicas. Gestiona parámetros generales, contenido de Internet Banking y servicios.',
             ],
         ];
 

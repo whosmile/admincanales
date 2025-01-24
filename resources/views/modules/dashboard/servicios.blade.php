@@ -1,73 +1,99 @@
 @extends('layouts.dashboard')
 
-@section('titulo_pagina')
-    Servicios
-@endsection
+@section('title', 'Servicios')
 
 @section('content')
+@php
+    use App\Models\User;
+    use Illuminate\Support\Facades\Auth;
+
+    $user = User::with('role')
+        ->where('id', Auth::id())
+        ->first();
+@endphp
+
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
-            <h1 class="mb-4">Servicios Bancarios</h1>
-            <div class="card shadow-sm">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Gestión de Servicios</h3>
+                    @if($user && $user->role)
+                    <div class="card-tools d-flex align-items-center">
+                        <form action="{{ route('servicios.index') }}" method="GET" class="d-flex me-2">
+                            <input type="text" name="search" class="form-control form-control-sm me-2" 
+                                   placeholder="Buscar servicio..." 
+                                   value="{{ $search ?? '' }}">
+                            <button type="submit" class="btn btn-sm btn-primary me-2">
+                                <i class="fas fa-search"></i>
+                            </button>
+                            @if(!empty($search))
+                            <a href="{{ route('servicios.index') }}" class="btn btn-sm btn-secondary">
+                                <i class="fas fa-times"></i>
+                            </a>
+                            @endif
+                        </form>
+                        @if($user->role->nombre !== 'Operador')
+                        <a href="{{ route('servicios.create') }}" class="btn btn-sm btn-primary">
+                            <i class="fas fa-plus"></i> Añadir Servicio
+                        </a>
+                        @endif
+                    </div>
+                    @endif
+                </div>
                 <div class="card-body">
-                    <form id="servicioForm">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="tipoServicio" class="form-label">Tipo de Servicio</label>
-                                    <select class="form-select" id="tipoServicio" name="tipoServicio">
-                                        <option value="">Seleccione un servicio...</option>
-                                        <option value="TELEFONIA">Telefonía</option>
-                                        <option value="ELECTRICIDAD">Electricidad</option>
-                                        <option value="AGUA">Agua</option>
-                                        <option value="INTERNET">Internet</option>
-                                        <option value="TELEVISION">Televisión por Cable</option>
-                                        <option value="GAS">Gas Natural</option>
-                                        <option value="SEGUROS">Seguros</option>
-                                        <option value="IMPUESTOS">Impuestos</option>
-                                        <option value="EDUCACION">Instituciones Educativas</option>
-                                        <option value="TARJETAS">Tarjetas de Crédito</option>
-                                    </select>
-                                </div>
-
-                                <button type="submit" class="btn btn-primary" id="btnBuscar">
-                                    <i class="fas fa-search me-2"></i>Buscar
-                                </button>
-                            </div>
+                    @if($servicios->isEmpty())
+                        <div class="alert alert-info text-center">
+                            @if(!empty($search))
+                                No se encontraron servicios que coincidan con "{{ $search }}".
+                            @else
+                                No hay servicios registrados.
+                            @endif
                         </div>
-                    </form>
-
-                    <!-- Tabla de servicios -->
-                    <div class="table-responsive mt-4" id="tablaServicios" style="display: none;">
-                        <table class="table table-striped table-hover">
+                    @else
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
                             <thead>
                                 <tr>
+                                    <th>ID</th>
                                     <th>Nombre</th>
-                                    <th>Tipo</th>
+                                    <th>Tipo de Servicio</th>
                                     <th>Estatus</th>
                                     <th>Límite Mínimo</th>
                                     <th>Límite Máximo</th>
                                     <th>Máxima Afiliación</th>
+                                    @if($user->role->nombre !== 'Operador')
                                     <th>Acciones</th>
+                                    @endif
                                 </tr>
                             </thead>
-                            <tbody id="tablaServiciosBody">
+                            <tbody>
+                                @foreach($servicios as $servicio)
+                                <tr>
+                                    <td>{{ $servicio->id }}</td>
+                                    <td>{{ $servicio->nombre }}</td>
+                                    <td>{{ $servicio->tipo_servicio }}</td>
+                                    <td>
+                                        <span class="badge {{ $servicio->estatus ? 'bg-success' : 'bg-danger' }}">
+                                            {{ $servicio->estatus ? 'Activo' : 'Inactivo' }}
+                                        </span>
+                                    </td>
+                                    <td>{{ number_format($servicio->limite_minimo, 2) }}</td>
+                                    <td>{{ number_format($servicio->limite_maximo, 2) }}</td>
+                                    <td>{{ $servicio->maxima_afiliacion }}</td>
+                                    @if($user->role->nombre !== 'Operador')
+                                    <td>
+                                        <a href="{{ route('servicios.edit', $servicio->id) }}" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-edit"></i> Editar
+                                        </a>
+                                    </td>
+                                    @endif
+                                </tr>
+                                @endforeach
                             </tbody>
                         </table>
                     </div>
-
-                    <!-- Loading spinner -->
-                    <div id="loadingSpinner" class="text-center mt-4" style="display: none;">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Cargando...</span>
-                        </div>
-                        <p class="mt-2">Cargando servicios...</p>
-                    </div>
-
-                    <!-- Mensaje de error -->
-                    <div id="errorMessage" class="alert alert-danger mt-4" style="display: none;">
-                    </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -137,19 +163,27 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Llenar tabla con datos
                     data.data.forEach(servicio => {
                         console.log('Processing service:', servicio);
-                        console.log('Service type:', servicio.tipo_servicio, servicio.TIPO_SERVICIO, servicio.tipo);
+                        console.log('Service Details:', {
+                            id: servicio.id,
+                            nombre: servicio.nombre,
+                            tipo: servicio.tipo,
+                            estatus: servicio.estatus,
+                            activo_raw: servicio.activo_raw
+                        });
                         const row = document.createElement('tr');
                         row.innerHTML = `
                             <td>${servicio.nombre || 'N/A'}</td>
                             <td>${servicio.tipo || servicio.TIPO_SERVICIO || 'N/A'}</td>
-                            <td>${servicio.estatus ? '<span class="badge bg-success">Activo</span>' : '<span class="badge bg-danger">Inactivo</span>'}</td>
+                            <td>${servicio.estatus === 'Activo' ? '<span class="badge bg-success">Activo</span>' : '<span class="badge bg-danger">Inactivo</span>'}</td>
                             <td>${servicio.limite_minimo || 'N/A'}</td>
                             <td>${servicio.limite_maximo || 'N/A'}</td>
                             <td>${servicio.maxima_afiliacion || 'N/A'}</td>
                             <td>
-                                <a href="/servicios/${servicio.id}/edit" class="btn btn-sm btn-primary">
+                                @if($user && $user->role && $user->role->nombre !== 'Operador')
+                                <a href="{{ route('servicios.edit', $servicio->id) }}" class="btn btn-sm btn-primary">
                                     <i class="fas fa-edit"></i> Editar
                                 </a>
+                                @endif
                             </td>
                         `;
                         tablaServiciosBody.appendChild(row);

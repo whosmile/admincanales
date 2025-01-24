@@ -1,0 +1,43 @@
+@startuml DFD Nivel 0 - Sistema AdminCanales Simplificado
+
+!define ENTITY entity
+!define PROCESS process
+!define STORAGE database
+
+skinparam roundcorner 20
+skinparam backgroundColor white
+skinparam ArrowColor black
+skinparam EntityBackgroundColor lightblue
+skinparam ProcessBackgroundColor lightgreen
+skinparam StorageBackgroundColor lightyellow
+
+' Entidades principales
+[Cliente] as E1 ENTITY
+[Administrador] as E2 ENTITY
+[Empresa de\nServicios] as E3 ENTITY
+
+' Proceso central
+rectangle "Sistema\nAdminCanales" as P1 PROCESS
+
+' Base de datos
+database "Base de\nDatos" as D1 STORAGE
+
+' Flujos principales
+E1 --> P1 : Solicitudes y\nTransacciones
+P1 --> E1 : Respuestas y\nNotificaciones
+
+E2 --> P1 : Gestión y\nConfiguración
+P1 --> E2 : Reportes y\nBitácora
+
+E3 --> P1 : Info. Servicios
+P1 --> E3 : Estadísticas
+
+' Flujo con base de datos
+P1 <--> D1 : Datos
+
+legend right
+  DFD Nivel 0
+  Sistema AdminCanales
+end legend
+
+@enduml

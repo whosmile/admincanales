@@ -70,6 +70,12 @@
                                     <span>Log Transaccional</span>
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->routeIs('admin.web-transactional-log.index') ? 'active' : '' }}" href="{{ route('admin.web-transactional-log.index') }}">
+                                    <i class="fas fa-globe"></i>
+                                    <span>Bitácora Web Transaccional</span>
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </li>

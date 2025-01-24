@@ -62,6 +62,7 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'logtransaccional' => \App\Http\Middleware\EnsureLogTransaccionalIsConfigured::class,
         'check.role' => \App\Http\Middleware\CheckRole::class,
+        'check.operator' => \App\Http\Middleware\CheckOperatorAccess::class,
     ];
 
     /**

@@ -8,8 +8,8 @@
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <div class="card shadow-lg">
-                    <div class="card-header bg-orange text-white">
-                        <h1 class="h4 mb-0">Registrar Nuevo Usuario</h1>
+                    <div class="card-header">
+                        <h1 class="h4 mb-0 text-dark">Registrar Nuevo Usuario</h1>
                     </div>
 
                     <div class="card-body p-4">

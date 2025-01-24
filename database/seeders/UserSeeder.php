@@ -12,7 +12,7 @@ class UserSeeder extends Seeder
     {
         // Obtener el ID del rol de administrador
         $adminRole = DB::table('roles')->where('nombre', 'Administrador')->first();
-        $userRole = DB::table('roles')->where('nombre', 'Usuario')->first();
+        $userMasterRole = DB::table('roles')->where('nombre', 'Usuario Máster')->first();
         $operadorRole = DB::table('roles')->where('nombre', 'Operador')->first();
 
         $users = [
@@ -28,13 +28,13 @@ class UserSeeder extends Seeder
             ],
             [
                 'name' => 'Usuario',
-                'apellido' => 'Demo',
-                'email' => 'usuario@demo.com',
-                'username' => 'usuario',
+                'apellido' => 'Máster',
+                'email' => 'master@demo.com',
+                'username' => 'master',
                 'password' => Hash::make('password123'),
                 'telefono' => '04141234568',
                 'cedula' => 'V-87654321',
-                'role_id' => $userRole->id,
+                'role_id' => $userMasterRole->id,
             ],
             [
                 'name' => 'Operador',

@@ -55,7 +55,18 @@
 
             <!-- Resultados -->
             <div class="resultados-card mt-4" id="resultados" style="display: none;">
-                <div class="card">
+                <div class="d-flex justify-content-end mb-3 gap-2">
+                    <button type="button" class="btn btn-primary" id="modificarLimites">
+                        <i class="fas fa-edit me-1"></i>Modificar Límites
+                    </button>
+                    <button type="button" class="btn btn-primary" id="bloqueoPreventivo">
+                        <i class="fas fa-lock me-1"></i>Bloqueo Preventivo
+                    </button>
+                    <a href="{{ route('permiso-vuelto') }}" class="btn btn-primary" id="permisoVuelto">
+                        <i class="fas fa-clock me-1"></i>Permiso Vuelto al Instante
+                    </a>
+                </div>
+                <div class="card mb-4">
                     <div class="card-body">
                         <h5 class="card-title mb-4">Información del Cliente</h5>
                         <div class="row">
@@ -97,6 +108,27 @@
                                     <p class="mb-0" id="info-role"></p>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Límites de Transferencias y Pagos -->
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">Límites Transferencias y Pagos</h5>
+                        <div class="table-responsive">
+                            <table class="table table-bordered mb-0">
+                                <tbody>
+                                    <tr>
+                                        <th class="bg-light" style="width: 50%">Terceros en DELSUR:</th>
+                                        <td id="info-limite-delsur">Sin Límites</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="bg-light">Otros Bancos:</th>
+                                        <td id="info-limite-otros">50.000,00</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -171,6 +203,17 @@
 
     .text-muted {
         color: var(--bs-secondary) !important;
+    }
+
+    .table th {
+        background-color: var(--bs-gray-100);
+        font-weight: 500;
+        color: var(--bs-emphasis-color);
+    }
+    
+    .table td {
+        font-weight: 500;
+        color: var(--bs-body-color);
     }
 </style>
 @endpush
@@ -283,6 +326,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     data.data.role ? data.data.role.nombre : 'No asignado';
                 document.getElementById('info-role').textContent = 
                     data.data.role ? data.data.role.nombre : 'No asignado';
+                
+                // Límites de transferencias y pagos
+                document.getElementById('info-limite-delsur').textContent = data.data.limite_delsur;
+                document.getElementById('info-limite-otros').textContent = data.data.limite_otros;
             } else {
                 // Mostrar mensaje de no encontrado
                 resultados.style.display = 'none';

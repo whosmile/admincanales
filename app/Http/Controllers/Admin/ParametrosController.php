@@ -7,6 +7,7 @@ use App\Models\Parametro;
 use App\Models\Bitacora;
 use App\Models\Modulo;
 use App\Models\GrupoParametro;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
@@ -16,45 +17,67 @@ class ParametrosController extends Controller
 {
     public function index(Request $request)
     {
+        // Get the authenticated user with role
+        $user = Auth::user()->load('role');
+
+        // Get search query
         $search = $request->get('search');
 
-        $parametros = Parametro::when($search, function ($query) use ($search) {
-            return $query->where('codigo', 'like', "%{$search}%")
-                        ->orWhere('descripcion', 'like', "%{$search}%");
-        })->get();
-
-        if ($search) {
-            // Registrar búsqueda en bitácora
-            $user = Auth::user();
-            $modulo = Modulo::firstOrCreate(
-                ['codigo' => 'PARAMETROS'],
-                [
-                    'nombre' => 'Parámetros',
-                    'descripcion' => 'Módulo de gestión de parámetros del sistema',
-                    'activo' => true
-                ]
+        // Base query for parameters
+        $query = Parametro::with('grupo')
+            ->select(
+                'id',
+                'codigo',
+                'valor',
+                'descripcion',
+                'grupo_id',
+                'created_at',
+                'updated_at'
             );
 
-            Bitacora::create([
-                'user_id' => $user->id,
-                'usuario' => $user->name . ' ' . $user->apellido,
-                'accion' => 'búsqueda',
-                'modulo_id' => $modulo->id,
-                'detalles' => "Término de búsqueda: {$search}\nResultados encontrados: {$parametros->count()}"
-            ]);
+        // Apply search filter if search query exists
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('codigo', 'like', "%{$search}%")
+                  ->orWhere('descripcion', 'like', "%{$search}%")
+                  ->orWhereHas('grupo', function($subQuery) use ($search) {
+                      $subQuery->where('nombre', 'like', "%{$search}%");
+                  });
+            });
         }
 
-        return view('modules.dashboard.parametros', compact('parametros', 'search'));
+        // Get filtered parameters
+        $parametros = $query->get();
+
+        return view('modules.dashboard.parametros', compact('user', 'parametros', 'search'));
     }
 
     public function create()
     {
+        // Prevent Operador from accessing create page
+        $user = User::with('role')
+            ->where('id', Auth::id())
+            ->first();
+        
+        if ($user && $user->role && $user->role->nombre === 'Operador') {
+            abort(403, 'No tienes permiso para crear parámetros.');
+        }
+
         $grupos = GrupoParametro::all();
         return view('modules.dashboard.parametros.create', compact('grupos'));
     }
 
     public function store(Request $request)
     {
+        // Prevent Operador from storing parameters
+        $user = User::with('role')
+            ->where('id', Auth::id())
+            ->first();
+        
+        if ($user && $user->role && $user->role->nombre === 'Operador') {
+            abort(403, 'No tienes permiso para crear parámetros.');
+        }
+
         $request->validate([
             'codigo' => [
                 'required',
@@ -96,19 +119,38 @@ class ParametrosController extends Controller
         return redirect()->route('parametros.index')->with('success', 'Parámetro creado exitosamente');
     }
 
-    public function edit(Parametro $parametro)
+    public function edit($id)
     {
+        // Prevent Operador from accessing edit page
+        $user = User::with('role')
+            ->where('id', Auth::id())
+            ->first();
+        
+        if ($user && $user->role && $user->role->nombre === 'Operador') {
+            abort(403, 'No tienes permiso para editar parámetros.');
+        }
+
+        $parametro = Parametro::find($id);
         return view('modules.dashboard.parametros.edit', compact('parametro'));
     }
 
-    public function update(Request $request, Parametro $parametro)
+    public function update(Request $request, $id)
     {
+        // Prevent Operador from accessing update method
+        $user = User::with('role')
+            ->where('id', Auth::id())
+            ->first();
+        
+        if ($user && $user->role && $user->role->nombre === 'Operador') {
+            abort(403, 'No tienes permiso para editar parámetros.');
+        }
+
         $request->validate([
             'codigo' => [
                 'required',
                 'string',
                 'regex:/^[a-z]+(\\.[a-z]+)*$/',
-                Rule::unique('parametros')->ignore($parametro->id)
+                Rule::unique('parametros')->ignore($id)
             ],
             'descripcion' => 'required|string|max:255',
             'valor' => 'required|string|max:255'
@@ -117,17 +159,17 @@ class ParametrosController extends Controller
             'codigo.unique' => 'Este código ya está en uso.'
         ]);
 
-        $oldData = $parametro->toArray();
-        $parametro->update($request->only(['codigo', 'descripcion', 'valor']));
+        $oldData = Parametro::find($id)->toArray();
+        Parametro::find($id)->update($request->only(['codigo', 'descripcion', 'valor']));
 
         // Registrar actualización en bitácora
         Bitacora::create([
             'user_id' => Auth::id(),
             'accion' => 'actualización',
             'modulo' => 'parámetros',
-            'descripcion' => "Actualización del parámetro: {$parametro->codigo}",
+            'descripcion' => "Actualización del parámetro: " . Parametro::find($id)->codigo,
             'detalles' => "Datos anteriores:\nCódigo: {$oldData['codigo']}\nDescripción: {$oldData['descripcion']}\nValor: {$oldData['valor']}\n\n" .
-                         "Datos nuevos:\nCódigo: {$parametro->codigo}\nDescripción: {$parametro->descripcion}\nValor: {$parametro->valor}"
+                         "Datos nuevos:\nCódigo: " . Parametro::find($id)->codigo . "\nDescripción: " . Parametro::find($id)->descripcion . "\nValor: " . Parametro::find($id)->valor
         ]);
 
         return redirect()->route('parametros.index')->with('success', 'Parámetro actualizado exitosamente');

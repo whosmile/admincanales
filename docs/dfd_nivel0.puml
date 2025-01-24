@@ -1,0 +1,45 @@
+@startuml DFD Nivel 0 - Sistema AdminCanales
+
+!define ENTITY entity
+!define PROCESS process
+!define STORAGE database
+
+skinparam roundcorner 20
+skinparam backgroundColor white
+skinparam ArrowColor black
+skinparam EntityBackgroundColor lightblue
+skinparam ProcessBackgroundColor lightgreen
+skinparam StorageBackgroundColor lightyellow
+
+' Entidades externas
+[Cliente] as E1 ENTITY
+[Administrador] as E2 ENTITY
+[Empresa de Servicios] as E3 ENTITY
+
+' Proceso principal
+rectangle "Sistema de Gestión\nAdminCanales" as P1 PROCESS
+
+' Almacenes de datos
+database "Base de Datos" as D1 STORAGE
+
+' Flujos desde Entidades al Sistema
+E1 --> P1 : Solicitud de servicios\nAfiliaciones\nTransacciones
+E2 --> P1 : Gestión de usuarios\nConfiguración del sistema\nMonitoreo
+E3 --> P1 : Información de servicios\nLímites y configuraciones
+
+' Flujos desde el Sistema a las Entidades
+P1 --> E1 : Confirmación de transacciones\nEstado de servicios\nNotificaciones
+P1 --> E2 : Reportes\nBitácora\nEstadísticas
+P1 --> E3 : Reportes de servicios\nEstadísticas de uso
+
+' Flujos con la Base de Datos
+P1 <--> D1 : Almacenamiento y\nrecuperación de datos
+
+legend right
+  DFD Nivel 0 - Sistema AdminCanales
+  --
+  Muestra las interacciones principales
+  entre entidades externas y el sistema
+end legend
+
+@enduml

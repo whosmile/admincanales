@@ -6,7 +6,9 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Admin\ConsultasController;
 use App\Http\Controllers\Admin\ParametrosController;
 use App\Http\Controllers\Admin\ServiciosController;
+use App\Http\Controllers\Admin\WebTransactionalLogController;
 use App\Http\Controllers\User\PerfilController;
+use App\Http\Controllers\PermisoVueltoController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -84,6 +86,17 @@ Route::middleware('auth')->group(function () {
         Route::delete('/avatar', [PerfilController::class, 'deleteAvatar'])->name('perfil.delete-avatar');
     });
     
+    // Permiso Vuelto
+    Route::get('/permiso-vuelto', [PermisoVueltoController::class, 'index'])->name('permiso-vuelto');
+    
     // Cerrar Sesión
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+    
+    Route::middleware(['auth', 'verified'])->group(function () {
+        Route::get('admin/web-transactional-log', [WebTransactionalLogController::class, 'index'])->name('admin.web-transactional-log.index');
+    });
+    
+    Route::middleware(['auth', 'check.operator'])->group(function () {
+        // Add routes that should be restricted to non-Operador users here
+    });
 });
