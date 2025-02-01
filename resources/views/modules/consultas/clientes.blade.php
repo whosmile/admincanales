@@ -54,7 +54,7 @@
             </div>
 
             <!-- Resultados -->
-            <div class="resultados-card mt-4" id="resultados" style="display: none;">
+            <div class="resultados-card mt-4" id="resultados" style="display: {{ isset($clienteData) ? 'block' : 'none' }};">
                 <div class="d-flex justify-content-end mb-3 gap-2">
                     <button type="button" class="btn btn-primary" id="modificarLimites">
                         <i class="fas fa-edit me-1"></i>Modificar Límites
@@ -62,8 +62,8 @@
                     <button type="button" class="btn btn-primary" id="bloqueoPreventivo">
                         <i class="fas fa-lock me-1"></i>Bloqueo Preventivo
                     </button>
-                    <a href="{{ route('permiso-vuelto') }}" class="btn btn-primary" id="permisoVuelto">
-                        <i class="fas fa-clock me-1"></i>Permiso Vuelto al Instante
+                    <a href="{{ route('permiso-vuelto.index') }}" class="btn btn-primary" id="permisoVuelto">
+                        <i class="fas fa-cog me-1"></i>Permiso Vuelto
                     </a>
                 </div>
                 <div class="card mb-4">
@@ -73,39 +73,63 @@
                             <div class="col-md-6">
                                 <div class="info-group mb-3">
                                     <label class="info-label">Nombre de Usuario</label>
-                                    <p class="mb-0" id="info-nombre"></p>
+                                    <p class="mb-0" id="info-nombre">{{ $clienteData['nombre'] ?? '' }}</p>
                                 </div>
                                 <div class="info-group mb-3">
                                     <label class="info-label">Cédula</label>
-                                    <p class="mb-0" id="info-cedula"></p>
+                                    <p class="mb-0" id="info-cedula">{{ $clienteData['cedula'] ?? '' }}</p>
                                 </div>
                                 <div class="info-group mb-3">
                                     <label class="info-label">Email</label>
-                                    <p class="mb-0" id="info-email"></p>
+                                    <p class="mb-0" id="info-email">{{ $clienteData['email'] ?? '' }}</p>
                                 </div>
                                 <div class="info-group mb-3">
                                     <label class="info-label">Teléfono</label>
-                                    <p class="mb-0" id="info-telefono"></p>
+                                    <p class="mb-0" id="info-telefono">{{ $clienteData['telefono'] ?? '' }}</p>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="info-group mb-3">
                                     <label class="info-label">Última Interacción</label>
-                                    <p class="mb-0" id="info-ultima-interaccion"></p>
+                                    <p class="mb-0" id="info-ultima-interaccion">
+                                        @if(isset($clienteData['ultimo_login']))
+                                            {{ \Carbon\Carbon::parse($clienteData['ultimo_login'])->format('d-m-Y H:i:s') }}
+                                        @else
+                                            Nunca
+                                        @endif
+                                    </p>
                                 </div>
                                 <div class="info-group mb-3">
                                     <label class="info-label">Estado</label>
                                     <p class="mb-0">
-                                        <span class="badge" id="info-estado"></span>
+                                        <span class="badge" id="info-estado">
+                                            @if(isset($clienteData['status']))
+                                                {{ $clienteData['status'] === 'active' ? 'Activo' : 'Inactivo' }}
+                                            @else
+                                                No definido
+                                            @endif
+                                        </span>
                                     </p>
                                 </div>
                                 <div class="info-group mb-3">
                                     <label class="info-label">Tipo de Perfil</label>
-                                    <p class="mb-0" id="info-tipo-perfil"></p>
+                                    <p class="mb-0" id="info-tipo-perfil">
+                                        @if(isset($clienteData['role']))
+                                            {{ $clienteData['role']['nombre'] ?? 'No asignado' }}
+                                        @else
+                                            No asignado
+                                        @endif
+                                    </p>
                                 </div>
                                 <div class="info-group mb-3">
                                     <label class="info-label">Rol del Sistema</label>
-                                    <p class="mb-0" id="info-role"></p>
+                                    <p class="mb-0" id="info-role">
+                                        @if(isset($clienteData['role']))
+                                            {{ $clienteData['role']['nombre'] ?? 'No asignado' }}
+                                        @else
+                                            No asignado
+                                        @endif
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -121,11 +145,11 @@
                                 <tbody>
                                     <tr>
                                         <th class="bg-light" style="width: 50%">Terceros en DELSUR:</th>
-                                        <td id="info-limite-delsur">Sin Límites</td>
+                                        <td id="info-limite-delsur">{{ $clienteData['limite_delsur'] ?? 'Sin Límites' }}</td>
                                     </tr>
                                     <tr>
                                         <th class="bg-light">Otros Bancos:</th>
-                                        <td id="info-limite-otros">50.000,00</td>
+                                        <td id="info-limite-otros">{{ $clienteData['limite_otros'] ?? '50.000,00' }}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -343,6 +367,12 @@ document.addEventListener('DOMContentLoaded', function() {
             errorText.textContent = error.message || 'Error al buscar el cliente. Por favor, intente nuevamente.';
         }
     });
+    
+    // Si hay datos del cliente, rellenar el formulario
+    @if(isset($clienteData))
+    document.getElementById('tipo_cedula').value = '{{ substr($clienteData["cedula"], 0, 1) }}';
+    document.getElementById('cedula').value = '{{ substr($clienteData["cedula"], 2) }}';
+    @endif
 });
 </script>
 @endpush

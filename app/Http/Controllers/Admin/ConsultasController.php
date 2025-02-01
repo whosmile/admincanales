@@ -17,9 +17,23 @@ use Carbon\Carbon;
 
 class ConsultasController extends Controller
 {
-    public function clientes()
+    public function clientes(Request $request)
     {
-        return view('modules.consultas.clientes');
+        // Obtener los datos del cliente de la sesión si existen
+        $clienteData = null;
+        if ($request->session()->has('cliente_nombre')) {
+            $clienteData = [
+                'nombre' => $request->session()->get('cliente_nombre'),
+                'cedula' => $request->session()->get('cliente_login'),
+                'telefono' => $request->session()->get('cliente_telefono'),
+                'email' => $request->session()->get('cliente_email'),
+                'status' => $request->session()->get('cliente_status'),
+                'ultimo_login' => $request->session()->get('cliente_ultimo_login'),
+                'role' => $request->session()->get('cliente_role')
+            ];
+        }
+
+        return view('modules.consultas.clientes', compact('clienteData'));
     }
 
     public function buscarCliente(Request $request)
@@ -125,19 +139,29 @@ class ConsultasController extends Controller
             ]);
             Bitacora::create($logData);
 
+            // Guardar datos del cliente en la sesión
+            $request->session()->put([
+                'cliente_nombre' => $cliente->name . ' ' . $cliente->apellido,
+                'cliente_login' => $cliente->cedula,
+                'cliente_telefono' => $cliente->telefono,
+                'cliente_email' => $cliente->email,
+                'cliente_status' => $cliente->status,
+                'cliente_ultimo_login' => $cliente->ultimo_login,
+                'cliente_role' => $cliente->role ? [
+                    'nombre' => $cliente->role->nombre
+                ] : null
+            ]);
+
             return response()->json([
                 'success' => true,
                 'data' => [
-                    'id' => $cliente->id,
+                    'nombre' => $cliente->name . ' ' . $cliente->apellido,
                     'cedula' => $cliente->cedula,
-                    'name' => $cliente->name,
-                    'apellido' => $cliente->apellido,
                     'email' => $cliente->email,
                     'telefono' => $cliente->telefono,
+                    'ultimo_login' => $cliente->ultimo_login,
                     'status' => $cliente->status,
-                    'ultimo_login' => $cliente->ultimo_login ? $cliente->ultimo_login->format('Y-m-d H:i:s') : null,
                     'role' => $cliente->role ? [
-                        'id' => $cliente->role->id,
                         'nombre' => $cliente->role->nombre
                     ] : null
                 ]

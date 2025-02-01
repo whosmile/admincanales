@@ -87,7 +87,10 @@ Route::middleware('auth')->group(function () {
     });
     
     // Permiso Vuelto
-    Route::get('/permiso-vuelto', [PermisoVueltoController::class, 'index'])->name('permiso-vuelto');
+    Route::prefix('permiso-vuelto')->group(function () {
+        Route::get('/', [PermisoVueltoController::class, 'index'])->name('permiso-vuelto.index');
+        Route::post('/actualizar', [PermisoVueltoController::class, 'actualizarPermisos'])->name('permiso-vuelto.actualizar');
+    });
     
     // Cerrar Sesión
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
