@@ -16,8 +16,9 @@ return new class extends Migration
             $table->decimal('limite_minimo', 20, 2);
             $table->decimal('limite_maximo', 20, 2);
             $table->timestamp('fecha_actualizacion')->useCurrent();
-            $table->string('actualizado_por')->nullable();
+            $table->string('modificado_por')->nullable();
             $table->timestamps();
+            $table->string('created_by')->nullable();
             
             // Índice único para asegurar un solo registro activo por servicio
             $table->unique(['servicio_id', 'fecha_actualizacion']);
@@ -31,8 +32,9 @@ return new class extends Migration
             $table->boolean('requiere_verificacion')->default(false);
             $table->json('parametros_adicionales')->nullable();
             $table->timestamp('fecha_actualizacion')->useCurrent();
-            $table->string('actualizado_por')->nullable();
+            $table->string('modificado_por')->nullable();
             $table->timestamps();
+            $table->string('created_by')->nullable();
             
             // Índice único para asegurar un solo registro activo por servicio
             $table->unique(['servicio_id', 'fecha_actualizacion']);

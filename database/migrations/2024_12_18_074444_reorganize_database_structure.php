@@ -15,6 +15,8 @@ return new class extends Migration
                 $table->string('nombre', 50);
                 $table->text('descripcion')->nullable();
                 $table->timestamps();
+                $table->string('created_by')->nullable();
+                $table->string('modificado_por')->nullable();
             });
         }
 
@@ -25,6 +27,8 @@ return new class extends Migration
                 $table->string('codigo', 50)->unique();
                 $table->text('descripcion')->nullable();
                 $table->timestamps();
+                $table->string('created_by')->nullable();
+                $table->string('modificado_por')->nullable();
             });
         }
 
@@ -55,6 +59,8 @@ return new class extends Migration
                 $table->timestamp('bloqueado_hasta')->nullable();
                 $table->rememberToken();
                 $table->timestamps();
+                $table->string('created_by')->nullable();
+                $table->string('modificado_por')->nullable();
             });
         }
 

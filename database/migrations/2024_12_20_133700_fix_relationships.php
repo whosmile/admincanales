@@ -21,6 +21,8 @@ return new class extends Migration
                 $table->string('persona_contacto')->nullable();
                 $table->enum('estatus', ['Activo', 'Inactivo'])->default('Activo');
                 $table->timestamps();
+                $table->string('created_by')->nullable();
+                $table->string('modificado_por')->nullable();
             });
         }
 
@@ -70,6 +72,8 @@ return new class extends Migration
                 $table->string('nombre', 50);
                 $table->text('descripcion')->nullable();
                 $table->timestamps();
+                $table->string('created_by')->nullable();
+                $table->string('modificado_por')->nullable();
             });
 
             // Insertar estados por defecto
@@ -112,6 +116,8 @@ return new class extends Migration
                 if (!Schema::hasColumn('afiliaciones_servicio', 'servicio_id')) {
                     $table->foreignId('servicio_id')->nullable()->constrained('servicios')->onDelete('restrict');
                 }
+                // Agregar índice compuesto
+                $table->index(['user_id', 'servicio_id']);
             });
         }
     }

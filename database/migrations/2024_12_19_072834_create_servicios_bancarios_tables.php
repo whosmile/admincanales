@@ -18,6 +18,8 @@ return new class extends Migration
             $table->text('descripcion')->nullable();
             $table->boolean('activo')->default(true);
             $table->timestamps();
+            $table->string('created_by')->nullable();
+            $table->string('modificado_por')->nullable();
         });
 
         // Modificar la tabla servicios existente
@@ -31,6 +33,11 @@ return new class extends Migration
             $table->string('codigo_servicio', 50)->unique()->after('empresa');
             $table->boolean('activo')->default(true)->after('maxima_afiliacion');
             $table->text('descripcion')->nullable()->after('activo');
+            $table->string('created_by')->nullable();
+            $table->string('modificado_por')->nullable();
+
+            // Agregar índice para código de servicio
+            $table->index('codigo_servicio');
         });
     }
 
@@ -42,9 +49,13 @@ return new class extends Migration
         Schema::table('servicios', function (Blueprint $table) {
             // Revertir cambios en la tabla servicios
             $table->dropForeign(['tipo_servicio_id']);
-            $table->dropColumn(['tipo_servicio_id', 'empresa', 'codigo_servicio', 'activo', 'descripcion']);
+            $table->dropColumn(['tipo_servicio_id', 'empresa', 'codigo_servicio', 'activo', 'descripcion', 'created_by', 'modificado_por']);
             $table->enum('tipo_servicio', ['telefonia', 'electricidad', 'agua', 'tv']);
             $table->enum('estatus', ['Activo', 'Inactivo'])->default('Activo');
+        });
+
+        Schema::table('tipos_servicios', function (Blueprint $table) {
+            $table->dropColumn(['created_by', 'modificado_por']);
         });
 
         Schema::dropIfExists('tipos_servicios');
