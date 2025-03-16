@@ -8,16 +8,25 @@ class WebTransactionalLog extends Model
 {
     protected $fillable = [
         'user_id',
-        'action',
-        'module',
-        'description',
-        'details',
-        'ip_address',
+        'usuario',
+        'accion',
+        'modulo',
+        'tabla_afectada',
+        'detalles',
+        'datos_anteriores',
+        'datos_nuevos',
+        'parametros_busqueda',
+        'total_resultados',
+        'criterio_busqueda',
+        'filtros_aplicados',
+        'ip',
         'user_agent'
     ];
 
     protected $casts = [
-        'details' => 'array'
+        'datos_anteriores' => 'json',
+        'datos_nuevos' => 'json',
+        'parametros_busqueda' => 'json'
     ];
 
     public function user()

@@ -8,6 +8,7 @@ use App\Models\Bitacora;
 use App\Models\Modulo;
 use App\Models\GrupoParametro;
 use App\Models\User;
+use App\Models\WebTransactionalLog;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
@@ -18,7 +19,7 @@ class ParametrosController extends Controller
     public function index(Request $request)
     {
         // Get the authenticated user with role
-        $user = Auth::user()->load('role');
+        $user = User::with('role')->find(Auth::id());
 
         // Get search query
         $search = $request->get('search');
@@ -49,15 +50,31 @@ class ParametrosController extends Controller
         // Get filtered parameters
         $parametros = $query->get();
 
+        // Registrar la búsqueda en web_transactional_logs
+        if ($search) {
+            WebTransactionalLog::create([
+                'user_id' => $user->id,
+                'usuario' => $user->name . ' ' . $user->apellido,
+                'accion' => 'busqueda',
+                'modulo' => 'parametros_generales',
+                'tabla_afectada' => 'parametros',
+                'detalles' => 'Búsqueda realizada en parámetros generales',
+                'parametros_busqueda' => json_encode(['termino' => $search]),
+                'total_resultados' => $parametros->count(),
+                'criterio_busqueda' => $search,
+                'filtros_aplicados' => 'codigo, descripcion, nombre_grupo',
+                'ip' => $request->ip(),
+                'user_agent' => $request->userAgent()
+            ]);
+        }
+
         return view('modules.dashboard.parametros', compact('user', 'parametros', 'search'));
     }
 
     public function create()
     {
         // Prevent Operador from accessing create page
-        $user = User::with('role')
-            ->where('id', Auth::id())
-            ->first();
+        $user = User::with('role')->find(Auth::id());
         
         if ($user && $user->role && $user->role->nombre === 'Operador') {
             abort(403, 'No tienes permiso para crear parámetros.');
@@ -70,9 +87,7 @@ class ParametrosController extends Controller
     public function store(Request $request)
     {
         // Prevent Operador from storing parameters
-        $user = User::with('role')
-            ->where('id', Auth::id())
-            ->first();
+        $user = User::with('role')->find(Auth::id());
         
         if ($user && $user->role && $user->role->nombre === 'Operador') {
             abort(403, 'No tienes permiso para crear parámetros.');
@@ -122,9 +137,7 @@ class ParametrosController extends Controller
     public function edit($id)
     {
         // Prevent Operador from accessing edit page
-        $user = User::with('role')
-            ->where('id', Auth::id())
-            ->first();
+        $user = User::with('role')->find(Auth::id());
         
         if ($user && $user->role && $user->role->nombre === 'Operador') {
             abort(403, 'No tienes permiso para editar parámetros.');
@@ -137,9 +150,7 @@ class ParametrosController extends Controller
     public function update(Request $request, $id)
     {
         // Prevent Operador from accessing update method
-        $user = User::with('role')
-            ->where('id', Auth::id())
-            ->first();
+        $user = User::with('role')->find(Auth::id());
         
         if ($user && $user->role && $user->role->nombre === 'Operador') {
             abort(403, 'No tienes permiso para editar parámetros.');

@@ -81,13 +81,13 @@
                                     @forelse ($logs as $log)
                                         <tr>
                                             <td>{{ $log->created_at->format('d/m/Y H:i:s') }}</td>
-                                            <td>{{ $log->user ? $log->user->name : 'Sistema' }}</td>
-                                            <td>{{ $log->action }}</td>
-                                            <td>{{ $log->module }}</td>
-                                            <td>{{ $log->description }}</td>
-                                            <td>{{ $log->ip_address }}</td>
+                                            <td>{{ $log->usuario }}</td>
+                                            <td>{{ $log->accion }}</td>
+                                            <td>{{ $log->modulo }}</td>
+                                            <td>{{ $log->detalles }}</td>
+                                            <td>{{ $log->ip }}</td>
                                             <td>
-                                                @if($log->details)
+                                                @if($log->parametros_busqueda || $log->datos_anteriores || $log->datos_nuevos)
                                                     <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#detailsModal{{ $log->id }}">
                                                         Ver detalles
                                                     </button>
@@ -100,7 +100,25 @@
                                                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                                 </div>
                                                                 <div class="modal-body">
-                                                                    <pre>{{ json_encode($log->details, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
+                                                                    @if($log->parametros_busqueda)
+                                                                        <h6>Parámetros de Búsqueda:</h6>
+                                                                        <pre>{{ json_encode($log->parametros_busqueda, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
+                                                                    @endif
+                                                                    
+                                                                    @if($log->datos_anteriores)
+                                                                        <h6>Datos Anteriores:</h6>
+                                                                        <pre>{{ json_encode($log->datos_anteriores, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
+                                                                    @endif
+                                                                    
+                                                                    @if($log->datos_nuevos)
+                                                                        <h6>Datos Nuevos:</h6>
+                                                                        <pre>{{ json_encode($log->datos_nuevos, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
+                                                                    @endif
+                                                                    
+                                                                    @if($log->total_resultados !== null)
+                                                                        <h6>Total de Resultados:</h6>
+                                                                        <p>{{ $log->total_resultados }}</p>
+                                                                    @endif
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -164,6 +182,10 @@
     pre {
         white-space: pre-wrap;
         word-wrap: break-word;
+    }
+
+    .modal-dialog {
+        max-width: 800px;
     }
 </style>
 @endpush

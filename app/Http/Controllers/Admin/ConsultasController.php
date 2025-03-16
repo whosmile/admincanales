@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\Bitacora;
+use App\Models\BitacoraAdministrativa;
 use App\Models\Modulo;
 use App\Models\EstadoTransaccion;
 use App\Models\Transaccion;
@@ -217,8 +218,8 @@ class ConsultasController extends Controller
         $hasta = $request->input('hasta', Carbon::now()->format('Y-m-d'));
         $usuario = $request->input('usuario', '');
 
-        // Consultar la bitácora con los filtros
-        $bitacora = Bitacora::with(['user', 'modulo'])
+        // Consultar ambas bitácoras y unir los resultados
+        $bitacoraRegular = Bitacora::with(['user', 'modulo'])
             ->when($desde, function($query) use ($desde) {
                 return $query->whereDate('created_at', '>=', $desde);
             })
@@ -226,10 +227,23 @@ class ConsultasController extends Controller
                 return $query->whereDate('created_at', '<=', $hasta);
             })
             ->when($usuario, function($query) use ($usuario) {
-                return $query->whereHas('user', function($q) use ($usuario) {
-                    $q->where(DB::raw("CONCAT(name, ' ', apellido)"), 'LIKE', '%' . $usuario . '%');
-                });
+                return $query->where('usuario', 'LIKE', '%' . $usuario . '%');
             })
+            ->select('created_at', 'usuario', 'accion', 'detalles');
+
+        $bitacoraAdmin = BitacoraAdministrativa::when($desde, function($query) use ($desde) {
+                return $query->whereDate('created_at', '>=', $desde);
+            })
+            ->when($hasta, function($query) use ($hasta) {
+                return $query->whereDate('created_at', '<=', $hasta);
+            })
+            ->when($usuario, function($query) use ($usuario) {
+                return $query->where('usuario', 'LIKE', '%' . $usuario . '%');
+            })
+            ->select('created_at', 'usuario', 'accion', 'detalles');
+
+        // Unir las consultas y ordenar por fecha
+        $bitacora = $bitacoraRegular->union($bitacoraAdmin)
             ->orderBy('created_at', 'desc')
             ->paginate(15);
 

@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use App\Models\User;
+use App\Models\WebTransactionalLog;
+use App\Models\BitacoraAdministrativa;
 
 class LoginRequest extends FormRequest
 {
@@ -44,12 +47,49 @@ class LoginRequest extends FormRequest
         if (! Auth::attempt($this->only('username', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
+            // Registrar intento fallido en ambas bitácoras
+            $user = User::where('username', $this->input('username'))->first();
+            
+            $logData = [
+                'user_id' => $user ? $user->id : null,
+                'usuario' => $user ? ($user->name . ' ' . $user->apellido) : $this->input('username'),
+                'accion' => 'intento_fallido_login',
+                'modulo' => 'Autenticación',
+                'detalles' => 'Intento fallido de inicio de sesión',
+                'ip' => $this->ip(),
+                'user_agent' => $this->userAgent()
+            ];
+
+            WebTransactionalLog::create($logData + [
+                'datos_nuevos' => json_encode([
+                    'username' => $this->input('username'),
+                    'intentos' => RateLimiter::attempts($this->throttleKey())
+                ])
+            ]);
+
+            BitacoraAdministrativa::create($logData);
+
             throw ValidationException::withMessages([
                 'username' => trans('auth.failed'),
             ]);
         }
 
         RateLimiter::clear($this->throttleKey());
+
+        // Registrar inicio de sesión exitoso en ambas bitácoras
+        $user = Auth::user();
+        $logData = [
+            'user_id' => $user->id,
+            'usuario' => $user->name . ' ' . $user->apellido,
+            'accion' => 'inicio_sesion',
+            'modulo' => 'Autenticación',
+            'detalles' => 'El usuario ha iniciado sesión en el sistema',
+            'ip' => $this->ip(),
+            'user_agent' => $this->userAgent()
+        ];
+
+        WebTransactionalLog::create($logData);
+        BitacoraAdministrativa::create($logData);
     }
 
     /**
@@ -66,6 +106,29 @@ class LoginRequest extends FormRequest
         event(new Lockout($this));
 
         $seconds = RateLimiter::availableIn($this->throttleKey());
+
+        // Registrar bloqueo por intentos excesivos en ambas bitácoras
+        $user = User::where('username', $this->input('username'))->first();
+
+        $logData = [
+            'user_id' => $user ? $user->id : null,
+            'usuario' => $user ? ($user->name . ' ' . $user->apellido) : $this->input('username'),
+            'accion' => 'bloqueo_por_intentos',
+            'modulo' => 'Autenticación',
+            'detalles' => 'Usuario bloqueado por exceder el límite de intentos de inicio de sesión',
+            'ip' => $this->ip(),
+            'user_agent' => $this->userAgent()
+        ];
+
+        WebTransactionalLog::create($logData + [
+            'datos_nuevos' => json_encode([
+                'username' => $this->input('username'),
+                'tiempo_bloqueo_segundos' => $seconds,
+                'intentos_realizados' => RateLimiter::attempts($this->throttleKey())
+            ])
+        ]);
+
+        BitacoraAdministrativa::create($logData);
 
         throw ValidationException::withMessages([
             'username' => trans('auth.throttle', [

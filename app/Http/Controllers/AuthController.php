@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Models\WebTransactionalLog;
+use App\Models\BitacoraAdministrativa;
 
 class AuthController extends Controller
 {
@@ -142,8 +144,38 @@ class AuthController extends Controller
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
+            // Registrar el inicio de sesión exitoso en ambas bitácoras
+            $user = Auth::user();
+            $logData = [
+                'user_id' => $user->id,
+                'usuario' => $user->name . ' ' . $user->apellido,
+                'accion' => 'inicio_sesion',
+                'modulo' => 'Autenticación',
+                'detalles' => 'El usuario ha iniciado sesión en el sistema',
+                'ip' => $request->ip(),
+                'user_agent' => $request->userAgent()
+            ];
+
+            WebTransactionalLog::create($logData);
+            BitacoraAdministrativa::create($logData);
+
             return redirect()->intended('dashboard');
         }
+
+        // Registrar el intento fallido de inicio de sesión
+        $user = User::where('username', $request->username)->first();
+        $logData = [
+            'user_id' => $user ? $user->id : null,
+            'usuario' => $user ? ($user->name . ' ' . $user->apellido) : $request->username,
+            'accion' => 'intento_fallido_login',
+            'modulo' => 'Autenticación',
+            'detalles' => 'Intento fallido de inicio de sesión',
+            'ip' => $request->ip(),
+            'user_agent' => $request->userAgent()
+        ];
+
+        WebTransactionalLog::create($logData);
+        BitacoraAdministrativa::create($logData);
 
         return back()->withErrors([
             'username' => 'Las credenciales proporcionadas no coinciden con nuestros registros.',
@@ -152,6 +184,24 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
+        // Registrar el cierre de sesión en ambas bitácoras antes de cerrar la sesión
+        $user = Auth::user();
+        
+        if ($user) {
+            $logData = [
+                'user_id' => $user->id,
+                'usuario' => $user->name . ' ' . $user->apellido,
+                'accion' => 'cierre_sesion',
+                'modulo' => 'Autenticación',
+                'detalles' => 'El usuario ha cerrado sesión en el sistema',
+                'ip' => $request->ip(),
+                'user_agent' => $request->userAgent()
+            ];
+
+            WebTransactionalLog::create($logData);
+            BitacoraAdministrativa::create($logData);
+        }
+
         Auth::logout();
 
         $request->session()->invalidate();
