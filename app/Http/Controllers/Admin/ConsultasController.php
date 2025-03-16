@@ -14,6 +14,7 @@ use App\Models\Modulo;
 use App\Models\EstadoTransaccion;
 use App\Models\Transaccion;
 use App\Models\TipoTransaccion;
+use App\Models\UserLimit;
 use Carbon\Carbon;
 
 class ConsultasController extends Controller
@@ -30,7 +31,8 @@ class ConsultasController extends Controller
                 'email' => $request->session()->get('cliente_email'),
                 'status' => $request->session()->get('cliente_status'),
                 'ultimo_login' => $request->session()->get('cliente_ultimo_login'),
-                'role' => $request->session()->get('cliente_role')
+                'role' => $request->session()->get('cliente_role'),
+                'limits' => $request->session()->get('cliente_limits')
             ];
         }
 
@@ -126,6 +128,15 @@ class ConsultasController extends Controller
                 ]);
             }
 
+            // Obtener o crear los límites del cliente
+            $limits = UserLimit::firstOrCreate(
+                ['cedula' => $cliente->cedula],
+                [
+                    'limite_delsur' => 0,
+                    'limite_otros' => 50000.00
+                ]
+            );
+
             Log::info('Cliente encontrado', [
                 'cedula' => $cliente->cedula,
                 'nombre' => $cliente->name . ' ' . $cliente->apellido
@@ -140,6 +151,12 @@ class ConsultasController extends Controller
             ]);
             Bitacora::create($logData);
 
+            // Formatear los límites
+            $limitsData = [
+                'limite_delsur' => number_format($limits->limite_delsur, 2, ',', '.'),
+                'limite_otros' => number_format($limits->limite_otros, 2, ',', '.')
+            ];
+
             // Guardar datos del cliente en la sesión
             $request->session()->put([
                 'cliente_nombre' => $cliente->name . ' ' . $cliente->apellido,
@@ -150,7 +167,8 @@ class ConsultasController extends Controller
                 'cliente_ultimo_login' => $cliente->ultimo_login,
                 'cliente_role' => $cliente->role ? [
                     'nombre' => $cliente->role->nombre
-                ] : null
+                ] : null,
+                'cliente_limits' => $limitsData
             ]);
 
             return response()->json([
@@ -164,7 +182,8 @@ class ConsultasController extends Controller
                     'status' => $cliente->status,
                     'role' => $cliente->role ? [
                         'nombre' => $cliente->role->nombre
-                    ] : null
+                    ] : null,
+                    'limits' => $limitsData
                 ]
             ]);
 
@@ -206,7 +225,7 @@ class ConsultasController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Ha ocurrido un error al buscar el cliente. Por favor, intente nuevamente.'
+                'message' => 'Error al buscar el cliente. Por favor, intente nuevamente.'
             ], 500);
         }
     }

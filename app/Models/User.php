@@ -7,8 +7,10 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use App\Traits\RegistraActividad;
 use App\Models\Role;
+use App\Models\UserLimit;
 
 class User extends Authenticatable
 {
@@ -57,6 +59,14 @@ class User extends Authenticatable
     public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class);
+    }
+
+    /**
+     * Get the user's limits.
+     */
+    public function limits(): HasOne
+    {
+        return $this->hasOne(UserLimit::class, 'cedula', 'cedula');
     }
 
     /**

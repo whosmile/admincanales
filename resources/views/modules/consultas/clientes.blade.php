@@ -137,7 +137,7 @@
                 </div>
 
                 <!-- Límites de Transferencias y Pagos -->
-                <div class="card">
+                <div class="card" id="seccionLimites">
                     <div class="card-body">
                         <h5 class="card-title mb-4">Límites Transferencias y Pagos</h5>
                         <div class="table-responsive">
@@ -145,14 +145,43 @@
                                 <tbody>
                                     <tr>
                                         <th class="bg-light" style="width: 50%">Terceros en DELSUR:</th>
-                                        <td id="info-limite-delsur">{{ $clienteData['limite_delsur'] ?? 'Sin Límites' }}</td>
+                                        <td>
+                                            <div class="input-group">
+                                                <input type="text" 
+                                                       class="form-control text-end" 
+                                                       id="limite_delsur" 
+                                                       value="{{ $clienteData['limits']['limite_delsur'] ?? '0,00' }}"
+                                                       style="max-width: 200px;"
+                                                       readonly>
+                                                <button class="btn btn-outline-primary" type="button" onclick="guardarLimite('delsur')" disabled>
+                                                    <i class="fas fa-save"></i>
+                                                </button>
+                                            </div>
+                                        </td>
                                     </tr>
                                     <tr>
                                         <th class="bg-light">Otros Bancos:</th>
-                                        <td id="info-limite-otros">{{ $clienteData['limite_otros'] ?? '50.000,00' }}</td>
+                                        <td>
+                                            <div class="input-group">
+                                                <input type="text" 
+                                                       class="form-control text-end" 
+                                                       id="limite_otros" 
+                                                       value="{{ $clienteData['limits']['limite_otros'] ?? '50.000,00' }}"
+                                                       style="max-width: 200px;"
+                                                       readonly>
+                                                <button class="btn btn-outline-primary" type="button" onclick="guardarLimite('otros')" disabled>
+                                                    <i class="fas fa-save"></i>
+                                                </button>
+                                            </div>
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
+                        </div>
+                        <div class="text-center mt-4 d-none" id="cancelarModificacion">
+                            <button type="button" class="btn btn-danger">
+                                <i class="fas fa-sign-out-alt me-1"></i>Salir
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -161,7 +190,7 @@
             <!-- Mensaje de no resultados -->
             <div class="alert alert-info mt-4" id="no-resultados" style="display: none;">
                 <i class="fas fa-info-circle me-2"></i>
-                No se encontraron resultados para la cédula ingresada
+                No se encontró ningún cliente con la cédula especificada
             </div>
 
             <!-- Mensaje de error -->
@@ -199,17 +228,41 @@
     
     .info-label {
         font-size: 0.875rem;
+        color: var(--bs-gray-600);
         margin-bottom: 0.25rem;
-        color: var(--bs-emphasis-color);
-        font-weight: 500;
     }
-    
-    .info-group p {
+
+    /* Estilos para los campos de límites */
+    .input-group .form-control {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+        text-align: right;
         font-size: 1rem;
-        font-weight: 500;
-        color: var(--bs-body-color);
+        padding-right: 0.75rem;
     }
-    
+
+    .input-group .btn-outline-primary {
+        border-left: none;
+    }
+
+    .input-group .btn-outline-primary:hover {
+        background-color: var(--bs-primary);
+        color: white;
+    }
+
+    .input-group .btn-outline-primary:focus {
+        box-shadow: none;
+    }
+
+    .input-group .form-control:focus {
+        border-color: var(--bs-primary);
+        box-shadow: none;
+    }
+
+    .input-group .form-control:focus + .btn-outline-primary {
+        border-color: var(--bs-primary);
+    }
+
     .card {
         border: none;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -251,128 +304,226 @@ document.addEventListener('DOMContentLoaded', function() {
     const resultados = document.getElementById('resultados');
     const noResultados = document.getElementById('no-resultados');
     const errorMessage = document.getElementById('error-message');
-    const errorText = document.getElementById('error-text');
-    const buscarBtn = document.getElementById('buscarBtn');
+    const btnModificarLimites = document.getElementById('modificarLimites');
+    const btnCancelarContainer = document.getElementById('cancelarModificacion');
+    const limiteInputs = document.querySelectorAll('input[id^="limite_"]');
+    const btnGuardarLimites = document.querySelectorAll('button[onclick^="guardarLimite"]');
+    const seccionLimites = document.getElementById('seccionLimites');
     
-    // Solo permitir números en el campo de cédula
-    cedulaInput.addEventListener('input', function(e) {
-        this.value = this.value.replace(/[^0-9]/g, '');
+    // Estado de modificación de límites
+    let modificandoLimites = false;
+    
+    // Función para habilitar/deshabilitar la edición de límites
+    function toggleEdicionLimites(habilitar) {
+        modificandoLimites = habilitar;
         
-        if (this.value.length > 8) {
-            this.value = this.value.slice(0, 8);
+        // Mostrar/ocultar botones
+        btnModificarLimites.style.display = habilitar ? 'none' : 'block';
+        btnCancelarContainer.classList.toggle('d-none', !habilitar);
+        
+        // Habilitar/deshabilitar inputs y botones de guardar
+        limiteInputs.forEach(input => {
+            input.readOnly = !habilitar;
+            if (!habilitar) {
+                // Restaurar valores originales al cancelar
+                const tipo = input.id.replace('limite_', '');
+                input.value = input.getAttribute('data-original-value') || input.value;
+            }
+        });
+        
+        btnGuardarLimites.forEach(btn => {
+            btn.disabled = !habilitar;
+            btn.classList.toggle('btn-outline-primary', !habilitar);
+            btn.classList.toggle('btn-primary', habilitar);
+        });
+
+        // Si estamos habilitando la edición, hacer scroll suave a la sección de límites
+        if (habilitar && seccionLimites) {
+            seccionLimites.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
+    }
+    
+    // Event listener para el botón Modificar Límites
+    btnModificarLimites.addEventListener('click', () => {
+        toggleEdicionLimites(true);
+        
+        // Guardar valores originales
+        limiteInputs.forEach(input => {
+            input.setAttribute('data-original-value', input.value);
+        });
     });
     
-    // Prevenir pegar contenido no numérico
-    cedulaInput.addEventListener('paste', function(e) {
-        e.preventDefault();
-        const text = (e.originalEvent || e).clipboardData.getData('text/plain');
-        if (/^\d+$/.test(text)) {
-            this.value = text.slice(0, 8);
-        }
+    // Event listener para el botón Salir
+    btnCancelarContainer.querySelector('button').addEventListener('click', () => {
+        toggleEdicionLimites(false);
     });
     
+    // Formatear número con separadores de miles y decimales
+    function formatNumber(number) {
+        return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".").replace(/\.(?=[^.]*$)/, ",");
+    }
+
+    // Convertir formato español a número
+    function parseSpanishNumber(str) {
+        if (!str) return 0;
+        return parseFloat(str.replace(/\./g, '').replace(',', '.'));
+    }
+
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
         
         const tipoCedula = document.getElementById('tipo_cedula').value;
         let numeroCedula = cedulaInput.value;
         
-        // Validaciones
-        if (!numeroCedula) {
+        // Validar que la cédula solo contenga números
+        if (!/^\d+$/.test(numeroCedula)) {
+            errorMessage.querySelector('#error-text').textContent = 'La cédula debe contener solo números';
             errorMessage.style.display = 'block';
-            errorText.textContent = 'Por favor, ingrese un número de cédula.';
+            noResultados.style.display = 'none';
+            resultados.style.display = 'none';
             return;
         }
 
-        // Limpiar el número de cédula de cualquier carácter no numérico
-        numeroCedula = numeroCedula.replace(/[^0-9]/g, '');
-        
-        if (numeroCedula.length < 4) {
-            errorMessage.style.display = 'block';
-            errorText.textContent = 'El número de cédula debe tener al menos 4 dígitos.';
-            return;
-        }
-        
-        // Ocultar mensajes anteriores y mostrar loading
-        resultados.style.display = 'none';
-        noResultados.style.display = 'none';
-        errorMessage.style.display = 'none';
+        // Mostrar spinner de carga
         loading.style.display = 'block';
-        buscarBtn.disabled = true;
+        errorMessage.style.display = 'none';
+        noResultados.style.display = 'none';
+        resultados.style.display = 'none';
 
         try {
             const response = await fetch('/consultas/clientes/buscar', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    'Accept': 'application/json'
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                 },
                 body: JSON.stringify({
                     tipo_cedula: tipoCedula,
                     cedula: numeroCedula
                 })
             });
-
             const data = await response.json();
 
-            if (!response.ok) {
-                throw new Error(data.message || 'Error en el servidor');
-            }
-
             loading.style.display = 'none';
-            buscarBtn.disabled = false;
 
             if (data.success) {
-                // Mostrar los datos del cliente
+                // Mostrar resultados
                 resultados.style.display = 'block';
-                noResultados.style.display = 'none';
                 
-                // Actualizar la información en la vista
+                // Actualizar información del cliente
+                document.getElementById('info-nombre').textContent = data.data.nombre;
                 document.getElementById('info-cedula').textContent = data.data.cedula;
-                document.getElementById('info-nombre').textContent = 
-                    `${data.data.name} ${data.data.apellido}`.trim();
-                document.getElementById('info-email').textContent = 
-                    data.data.email || 'No disponible';
-                document.getElementById('info-telefono').textContent = 
-                    data.data.telefono || 'No disponible';
+                document.getElementById('info-email').textContent = data.data.email;
+                document.getElementById('info-telefono').textContent = data.data.telefono;
                 
-                const ultimaInteraccion = data.data.ultimo_login;
                 document.getElementById('info-ultima-interaccion').textContent = 
-                    ultimaInteraccion ? new Date(ultimaInteraccion).toLocaleString() : 'Nunca';
+                    data.data.ultimo_login ? new Date(data.data.ultimo_login).toLocaleString() : 'Nunca';
                 
-                const estadoBadge = document.getElementById('info-estado');
-                estadoBadge.textContent = data.data.status === 'active' ? 'Activo' : 'Inactivo';
-                estadoBadge.className = `badge ${data.data.status === 'active' ? 'bg-success' : 'bg-danger'}`;
+                document.getElementById('info-estado').textContent = 
+                    data.data.status === 'active' ? 'Activo' : 'Inactivo';
+                document.getElementById('info-estado').className = 
+                    `badge ${data.data.status === 'active' ? 'bg-success' : 'bg-danger'}`;
                 
                 document.getElementById('info-tipo-perfil').textContent = 
                     data.data.role ? data.data.role.nombre : 'No asignado';
                 document.getElementById('info-role').textContent = 
                     data.data.role ? data.data.role.nombre : 'No asignado';
                 
-                // Límites de transferencias y pagos
-                document.getElementById('info-limite-delsur').textContent = data.data.limite_delsur;
-                document.getElementById('info-limite-otros').textContent = data.data.limite_otros;
+                // Actualizar límites
+                if (data.data.limits) {
+                    document.getElementById('limite_delsur').value = data.data.limits.limite_delsur;
+                    document.getElementById('limite_otros').value = data.data.limits.limite_otros;
+                } else {
+                    document.getElementById('limite_delsur').value = '0,00';
+                    document.getElementById('limite_otros').value = '50.000,00';
+                }
+                
+                // Asegurarse de que los límites estén en modo lectura
+                toggleEdicionLimites(false);
             } else {
                 // Mostrar mensaje de no encontrado
-                resultados.style.display = 'none';
                 noResultados.style.display = 'block';
             }
         } catch (error) {
-            console.error('Error:', error);
             loading.style.display = 'none';
-            buscarBtn.disabled = false;
+            errorMessage.querySelector('#error-text').textContent = 'Error al buscar el cliente';
             errorMessage.style.display = 'block';
-            errorText.textContent = error.message || 'Error al buscar el cliente. Por favor, intente nuevamente.';
+            console.error('Error:', error);
         }
     });
-    
-    // Si hay datos del cliente, rellenar el formulario
-    @if(isset($clienteData))
-    document.getElementById('tipo_cedula').value = '{{ substr($clienteData["cedula"], 0, 1) }}';
-    document.getElementById('cedula').value = '{{ substr($clienteData["cedula"], 2) }}';
-    @endif
+
+    // Función para guardar límites
+    window.guardarLimite = async function(tipo) {
+        if (!modificandoLimites) return;
+
+        const cedula = document.getElementById('info-cedula').textContent;
+        const limiteInput = document.getElementById(`limite_${tipo}`);
+        const limiteValue = parseSpanishNumber(limiteInput.value);
+
+        console.log('Guardando límite:', {
+            tipo,
+            cedula,
+            valor: limiteValue
+        });
+
+        try {
+            const response = await fetch(`/clientes/${cedula}/limites/${tipo}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify({
+                    limite: limiteValue
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('Respuesta del servidor:', data);
+
+            if (data.success) {
+                // Actualizar el valor formateado en el input
+                if (data.data.limite_delsur) limiteInput.value = data.data.limite_delsur;
+                if (data.data.limite_otros) limiteInput.value = data.data.limite_otros;
+                
+                // Actualizar el valor original
+                limiteInput.setAttribute('data-original-value', limiteInput.value);
+                
+                // Mostrar mensaje de éxito
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Éxito!',
+                    text: 'Límite actualizado correctamente',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                
+                // Desactivar modo de edición después de guardar exitosamente
+                toggleEdicionLimites(false);
+            } else {
+                throw new Error(data.message || 'Error al actualizar el límite');
+            }
+        } catch (error) {
+            console.error('Error al guardar límite:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error.message || 'Error al actualizar el límite',
+                confirmButtonText: 'Aceptar'
+            });
+        }
+    };
+
+    // Inicializar tooltips de Bootstrap
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
 });
 </script>
 @endpush

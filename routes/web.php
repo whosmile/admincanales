@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\ServiciosController;
 use App\Http\Controllers\Admin\WebTransactionalLogController;
 use App\Http\Controllers\User\PerfilController;
 use App\Http\Controllers\PermisoVueltoController;
+use App\Http\Controllers\ClienteController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -55,6 +56,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/log-transaccional', [ConsultasController::class, 'logTransaccional'])
             ->middleware(\App\Http\Middleware\EnsureLogTransaccionalIsConfigured::class)
             ->name('consultas.log-transaccional');
+    });
+    
+    // Clientes
+    Route::prefix('clientes')->group(function () {
+        Route::get('/search/{cedula}', [ClienteController::class, 'search'])->name('clientes.search');
+        Route::post('/{cedula}/limites/{tipo}', [ClienteController::class, 'updateLimite'])->name('clientes.updateLimite');
     });
     
     // Parámetros
