@@ -14,19 +14,19 @@
             <div class="filtros-card">
                 <div class="filtros-body">
                     <form id="searchForm" class="row g-3">
-                        <div class="col-md-6 mx-auto">
+                        <div class="mx-auto col-md-6">
                             <div class="input-group">
                                 <!-- Selector de tipo de cédula -->
-                                <select class="form-select flex-grow-0" style="width: auto;" name="tipo_cedula" id="tipo_cedula" required>
+                                <select class="flex-grow-0 form-select" style="width: auto;" name="tipo_cedula" id="tipo_cedula" required>
                                     <option value="V">V</option>
                                     <option value="E">E</option>
                                 </select>
 
                                 <!-- Campo de cédula -->
-                                <input type="text" 
-                                       class="form-control" 
-                                       id="cedula" 
-                                       name="cedula" 
+                                <input type="text"
+                                       class="form-control"
+                                       id="cedula"
+                                       name="cedula"
                                        placeholder="Ingrese el número de cédula"
                                        pattern="[0-9]*"
                                        maxlength="8"
@@ -37,7 +37,7 @@
                                     <i class="fas fa-search me-1"></i>Buscar
                                 </button>
                             </div>
-                            <div class="form-text text-center mt-2">
+                            <div class="mt-2 text-center form-text">
                                 Ingrese solo números, máximo 8 dígitos
                             </div>
                         </div>
@@ -46,7 +46,7 @@
             </div>
 
             <!-- Spinner de carga -->
-            <div class="text-center mt-4" id="loading" style="display: none;">
+            <div class="mt-4 text-center" id="loading" style="display: none;">
                 <div class="spinner-border text-primary" role="status">
                     <span class="visually-hidden">Buscando...</span>
                 </div>
@@ -54,42 +54,42 @@
             </div>
 
             <!-- Resultados -->
-            <div class="resultados-card mt-4" id="resultados" style="display: {{ isset($clienteData) ? 'block' : 'none' }};">
-                <div class="d-flex justify-content-end mb-3 gap-2">
+            <div class="mt-4 resultados-card" id="resultados" style="display: {{ isset($clienteData) ? 'block' : 'none' }};">
+                <div class="gap-2 mb-3 d-flex justify-content-end">
                     <button type="button" class="btn btn-primary" id="modificarLimites">
                         <i class="fas fa-edit me-1"></i>Modificar Límites
                     </button>
-                    <button type="button" class="btn btn-primary" id="bloqueoPreventivo">
+                    {{-- <button type="button" class="btn btn-primary" id="bloqueoPreventivo">
                         <i class="fas fa-lock me-1"></i>Bloqueo Preventivo
-                    </button>
+                    </button> --}}
                     <a href="{{ route('permiso-vuelto.index') }}" class="btn btn-primary" id="permisoVuelto">
                         <i class="fas fa-cog me-1"></i>Permiso Vuelto
                     </a>
                 </div>
-                <div class="card mb-4">
+                <div class="mb-4 card">
                     <div class="card-body">
-                        <h5 class="card-title mb-4">Información del Cliente</h5>
+                        <h5 class="mb-4 card-title">Información del Cliente</h5>
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="info-group mb-3">
+                                <div class="mb-3 info-group">
                                     <label class="info-label">Nombre de Usuario</label>
                                     <p class="mb-0" id="info-nombre">{{ $clienteData['nombre'] ?? '' }}</p>
                                 </div>
-                                <div class="info-group mb-3">
+                                <div class="mb-3 info-group">
                                     <label class="info-label">Cédula</label>
                                     <p class="mb-0" id="info-cedula">{{ $clienteData['cedula'] ?? '' }}</p>
                                 </div>
-                                <div class="info-group mb-3">
+                                <div class="mb-3 info-group">
                                     <label class="info-label">Email</label>
                                     <p class="mb-0" id="info-email">{{ $clienteData['email'] ?? '' }}</p>
                                 </div>
-                                <div class="info-group mb-3">
+                                <div class="mb-3 info-group">
                                     <label class="info-label">Teléfono</label>
                                     <p class="mb-0" id="info-telefono">{{ $clienteData['telefono'] ?? '' }}</p>
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="info-group mb-3">
+                                <div class="mb-3 info-group">
                                     <label class="info-label">Última Interacción</label>
                                     <p class="mb-0" id="info-ultima-interaccion">
                                         @if(isset($clienteData['ultimo_login']))
@@ -99,7 +99,7 @@
                                         @endif
                                     </p>
                                 </div>
-                                <div class="info-group mb-3">
+                                <div class="mb-3 info-group">
                                     <label class="info-label">Estado</label>
                                     <p class="mb-0">
                                         <span class="badge" id="info-estado">
@@ -111,7 +111,7 @@
                                         </span>
                                     </p>
                                 </div>
-                                <div class="info-group mb-3">
+                                <div class="mb-3 info-group">
                                     <label class="info-label">Tipo de Perfil</label>
                                     <p class="mb-0" id="info-tipo-perfil">
                                         @if(isset($clienteData['role']))
@@ -121,7 +121,7 @@
                                         @endif
                                     </p>
                                 </div>
-                                <div class="info-group mb-3">
+                                <div class="mb-3 info-group">
                                     <label class="info-label">Rol del Sistema</label>
                                     <p class="mb-0" id="info-role">
                                         @if(isset($clienteData['role']))
@@ -139,17 +139,17 @@
                 <!-- Límites de Transferencias y Pagos -->
                 <div class="card" id="seccionLimites">
                     <div class="card-body">
-                        <h5 class="card-title mb-4">Límites Transferencias y Pagos</h5>
+                        <h5 class="mb-4 card-title">Límites Transferencias y Pagos</h5>
                         <div class="table-responsive">
-                            <table class="table table-bordered mb-0">
+                            <table class="table mb-0 table-bordered">
                                 <tbody>
                                     <tr>
                                         <th class="bg-light" style="width: 50%">Terceros en DELSUR:</th>
                                         <td>
                                             <div class="input-group">
-                                                <input type="text" 
-                                                       class="form-control text-end" 
-                                                       id="limite_delsur" 
+                                                <input type="text"
+                                                       class="form-control text-end"
+                                                       id="limite_delsur"
                                                        value="{{ $clienteData['limits']['limite_delsur'] ?? '0,00' }}"
                                                        style="max-width: 200px;"
                                                        readonly>
@@ -163,9 +163,9 @@
                                         <th class="bg-light">Otros Bancos:</th>
                                         <td>
                                             <div class="input-group">
-                                                <input type="text" 
-                                                       class="form-control text-end" 
-                                                       id="limite_otros" 
+                                                <input type="text"
+                                                       class="form-control text-end"
+                                                       id="limite_otros"
                                                        value="{{ $clienteData['limits']['limite_otros'] ?? '50.000,00' }}"
                                                        style="max-width: 200px;"
                                                        readonly>
@@ -178,7 +178,7 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div class="text-center mt-4 d-none" id="cancelarModificacion">
+                        <div class="mt-4 text-center d-none" id="cancelarModificacion">
                             <button type="button" class="btn btn-danger">
                                 <i class="fas fa-sign-out-alt me-1"></i>Salir
                             </button>
@@ -188,13 +188,13 @@
             </div>
 
             <!-- Mensaje de no resultados -->
-            <div class="alert alert-info mt-4" id="no-resultados" style="display: none;">
+            <div class="mt-4 alert alert-info" id="no-resultados" style="display: none;">
                 <i class="fas fa-info-circle me-2"></i>
                 No se encontró ningún cliente con la cédula especificada
             </div>
 
             <!-- Mensaje de error -->
-            <div class="alert alert-danger mt-4" id="error-message" style="display: none;">
+            <div class="mt-4 alert alert-danger" id="error-message" style="display: none;">
                 <i class="fas fa-exclamation-circle me-2"></i>
                 <span id="error-text"></span>
             </div>
@@ -213,11 +213,11 @@
         padding: 1.5rem;
         margin-bottom: 1rem;
     }
-    
+
     .form-text {
         color: var(--bs-secondary);
     }
-    
+
     #cedula {
         text-align: center;
         font-size: 1.1rem;
@@ -225,7 +225,7 @@
         color: var(--bs-body-color);
         background-color: var(--bs-body-bg);
     }
-    
+
     .info-label {
         font-size: 0.875rem;
         color: var(--bs-gray-600);
@@ -268,7 +268,7 @@
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         background-color: var(--bs-body-bg);
     }
-    
+
     .card-title {
         color: var(--bs-primary);
         font-weight: 600;
@@ -287,7 +287,7 @@
         font-weight: 500;
         color: var(--bs-emphasis-color);
     }
-    
+
     .table td {
         font-weight: 500;
         color: var(--bs-body-color);
@@ -309,18 +309,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const limiteInputs = document.querySelectorAll('input[id^="limite_"]');
     const btnGuardarLimites = document.querySelectorAll('button[onclick^="guardarLimite"]');
     const seccionLimites = document.getElementById('seccionLimites');
-    
+
     // Estado de modificación de límites
     let modificandoLimites = false;
-    
+
     // Función para habilitar/deshabilitar la edición de límites
     function toggleEdicionLimites(habilitar) {
         modificandoLimites = habilitar;
-        
+
         // Mostrar/ocultar botones
         btnModificarLimites.style.display = habilitar ? 'none' : 'block';
         btnCancelarContainer.classList.toggle('d-none', !habilitar);
-        
+
         // Habilitar/deshabilitar inputs y botones de guardar
         limiteInputs.forEach(input => {
             input.readOnly = !habilitar;
@@ -330,7 +330,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 input.value = input.getAttribute('data-original-value') || input.value;
             }
         });
-        
+
         btnGuardarLimites.forEach(btn => {
             btn.disabled = !habilitar;
             btn.classList.toggle('btn-outline-primary', !habilitar);
@@ -342,22 +342,22 @@ document.addEventListener('DOMContentLoaded', function() {
             seccionLimites.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
     }
-    
+
     // Event listener para el botón Modificar Límites
     btnModificarLimites.addEventListener('click', () => {
         toggleEdicionLimites(true);
-        
+
         // Guardar valores originales
         limiteInputs.forEach(input => {
             input.setAttribute('data-original-value', input.value);
         });
     });
-    
+
     // Event listener para el botón Salir
     btnCancelarContainer.querySelector('button').addEventListener('click', () => {
         toggleEdicionLimites(false);
     });
-    
+
     // Formatear número con separadores de miles y decimales
     function formatNumber(number) {
         return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".").replace(/\.(?=[^.]*$)/, ",");
@@ -371,10 +371,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
-        
+
         const tipoCedula = document.getElementById('tipo_cedula').value;
         let numeroCedula = cedulaInput.value;
-        
+
         // Validar que la cédula solo contenga números
         if (!/^\d+$/.test(numeroCedula)) {
             errorMessage.querySelector('#error-text').textContent = 'La cédula debe contener solo números';
@@ -409,26 +409,26 @@ document.addEventListener('DOMContentLoaded', function() {
             if (data.success) {
                 // Mostrar resultados
                 resultados.style.display = 'block';
-                
+
                 // Actualizar información del cliente
                 document.getElementById('info-nombre').textContent = data.data.nombre;
                 document.getElementById('info-cedula').textContent = data.data.cedula;
                 document.getElementById('info-email').textContent = data.data.email;
                 document.getElementById('info-telefono').textContent = data.data.telefono;
-                
-                document.getElementById('info-ultima-interaccion').textContent = 
+
+                document.getElementById('info-ultima-interaccion').textContent =
                     data.data.ultimo_login ? new Date(data.data.ultimo_login).toLocaleString() : 'Nunca';
-                
-                document.getElementById('info-estado').textContent = 
+
+                document.getElementById('info-estado').textContent =
                     data.data.status === 'active' ? 'Activo' : 'Inactivo';
-                document.getElementById('info-estado').className = 
+                document.getElementById('info-estado').className =
                     `badge ${data.data.status === 'active' ? 'bg-success' : 'bg-danger'}`;
-                
-                document.getElementById('info-tipo-perfil').textContent = 
+
+                document.getElementById('info-tipo-perfil').textContent =
                     data.data.role ? data.data.role.nombre : 'No asignado';
-                document.getElementById('info-role').textContent = 
+                document.getElementById('info-role').textContent =
                     data.data.role ? data.data.role.nombre : 'No asignado';
-                
+
                 // Actualizar límites
                 if (data.data.limits) {
                     document.getElementById('limite_delsur').value = data.data.limits.limite_delsur;
@@ -437,7 +437,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     document.getElementById('limite_delsur').value = '0,00';
                     document.getElementById('limite_otros').value = '50.000,00';
                 }
-                
+
                 // Asegurarse de que los límites estén en modo lectura
                 toggleEdicionLimites(false);
             } else {
@@ -490,10 +490,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Actualizar el valor formateado en el input
                 if (data.data.limite_delsur) limiteInput.value = data.data.limite_delsur;
                 if (data.data.limite_otros) limiteInput.value = data.data.limite_otros;
-                
+
                 // Actualizar el valor original
                 limiteInput.setAttribute('data-original-value', limiteInput.value);
-                
+
                 // Mostrar mensaje de éxito
                 Swal.fire({
                     icon: 'success',
@@ -502,7 +502,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     timer: 2000,
                     showConfirmButton: false
                 });
-                
+
                 // Desactivar modo de edición después de guardar exitosamente
                 toggleEdicionLimites(false);
             } else {
